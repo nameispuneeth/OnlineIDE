@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState,useRef } from "react";
 import { ThemeContext } from "../../contexts/ThemeContext";
 import { CircleAlert } from 'lucide-react';
 
@@ -9,33 +9,36 @@ export default function Register() {
     const [email,setemail]=useState('');
     const [pwd,setpwd]=useState('');
     const [Invalid,setInvalid]=useState(false);
+    const Error=useRef('');
     const [name,setname]=useState('');
     let HandleSubmission=async (e)=>{
+        setInvalid(false);
         e.preventDefault();
-
-        let Response=await fetch('http://localhost:8000/api/login',{
+        let Response=await fetch('http://localhost:8000/api/register',{
             method:'POST',
             headers:{
                 'Content-Type':'application/json'
             },
             body:JSON.stringify({
-                email,pwd
+                name,email,pwd
             })
         })
 
-        let data=Response.json();
+        let data=await Response.json();
+        console.log(data);
 
         if(data.status==='ok'){
             //Navigate To Home.js
         }else{
             setInvalid(true);
+            Error.current=data.error;
         }
     }
     let ErrorMsg=()=>{
         return(
             <div className="border-2 border-red-900 w-full gap-3 p-2 rounded bg-red-900 flex mb-5 ">
-                <CircleAlert/>
-                <p > Invalid Creditials</p>
+                <CircleAlert color='#ffffff'/>
+                <p className="text-white font-sans font-extralight"> {Error.current}</p>
             </div>
         )
     }
