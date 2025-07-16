@@ -26,6 +26,7 @@ export default function Login() {
         let data = await Response.json();
 
         if (data.status === 'ok') {
+            localStorage.setItem('myToken',data.token);
             //Navigate To Home.js
             alert("User Exists");
         } else {

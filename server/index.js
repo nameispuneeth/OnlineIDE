@@ -22,7 +22,12 @@ app.post('/api/login',async (req,res)=>{
             let PassComp=await bcrypt.compare(user.password,data.pwd);
             if(PassComp){
                 console.log(user);
-                res.json({status:'ok'})
+                const token=jwt.sign({
+                    name:user.name,
+                    password:user.password,
+                    email:user.email
+                },'secret-details')
+                res.json({status:'ok',token:token});
             }
             else{
                 res.json({status:'error',error:'Invalid Credientials'})
