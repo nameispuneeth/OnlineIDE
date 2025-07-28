@@ -1,7 +1,7 @@
 const express=require('express');
 const app=express();
-const cookieParser = require('cookie-parser');
 require('dotenv').config();
+
 const mongoose=require('mongoose');
 const User=require('./models/user.model');
 const cors=require('cors');
@@ -11,7 +11,6 @@ const { ObjectId } = require("mongoose").Types;
 
 app.use(cors());
 app.use(express.json())
-app.use(cookieParser());
 
 mongoose.connect('mongodb://localhost:27017/ONLINEIDE')
 const secretcode=process.env.secretCode;
@@ -21,8 +20,10 @@ app.get('/',(req,res)=>{
 
 app.post('/api/login',async (req,res)=>{
     let data=req.body;
+    console.log(data)
     try{
         const user=await User.findOne({email:data.email});
+        console.log(user);
         if(user){
             let PassComp=await bcrypt.compare(data.pwd,user.password);
             if(PassComp){
@@ -31,7 +32,7 @@ app.post('/api/login',async (req,res)=>{
                     email:user.email
                 },secretcode)
 
-
+                console.log(token);
                 res.json({status:'ok',token});
             }
             else{

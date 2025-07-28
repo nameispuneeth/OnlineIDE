@@ -209,8 +209,13 @@ export default function PlayGround() {
     };
     let SaveCode=async ()=>{
         const token=localStorage.getItem("token") || sessionStorage.getItem("token");
-        if(sessionStorage.getItem("code")){
-            const data=JSON.parse(sessionStorage.getItem("code"));
+        const stored = sessionStorage.getItem("code");
+        if(!token){
+            alert("Login To Save Code");
+            return;
+        }
+        else if(stored  && stored !== "undefined"){
+            const data=JSON.parse(stored);
 
             const Response=await fetch("http://localhost:8000/api/updateCode",{
                 method:"POST",
