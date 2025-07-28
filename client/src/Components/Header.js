@@ -8,11 +8,12 @@ import {
   Bars3Icon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
+import { useNavigate } from 'react-router-dom'
 
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
+  const navigate=useNavigate();
   return (
     <header className="bg-gray-900 text-white">
       <nav className="flex items-center justify-between p-4" aria-label="Global">
@@ -25,7 +26,7 @@ export default function Header() {
               src="https://flowbite.com/docs/images/logo.svg"
               alt="Flowbite Logo"
             />
-            <span className="text-white font-semibold text-lg">Flowbite</span>
+            <span className="text-white font-semibold text-lg cursor-pointer" onClick={()=>navigate("/")}>Flowbite</span>
           </a>
         </div>
 
