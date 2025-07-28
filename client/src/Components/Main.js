@@ -1,15 +1,12 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useRef, useState,useEffect } from "react";
 import { ThemeContext } from "../contexts/ThemeContext";
 import PlayGroundHeader from "./PlayGroundHeader";
-import { Sun, Moon, ArrowDownToLine, WandSparkles } from 'lucide-react';
+import { Sun, Moon, Save, WandSparkles } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import "../App.css";
+import Swal from 'sweetalert2';
 
-export default function PlayGround() {
-    const { theme, setTheme } = useContext(ThemeContext);
-    const DarkMode = theme === 'dark';
-
-    const Languages = [
+ const Languages = [
         {
             id: 92,
             name: "Python (3.11.2)",
@@ -40,7 +37,7 @@ export default function PlayGround() {
         },
         {
             id: 97,
-            name: "JavaScript (Node.js 20.17.0)",
+            name: "JavaScript (20.17.0)",
             code: `console.log("Hello, World!");`,
             extension: "js",
             lang: "javascript"
@@ -61,8 +58,35 @@ export default function PlayGround() {
 
         }
     ];
+export default function PlayGround() {
+    const { theme, setTheme } = useContext(ThemeContext);
+    const DarkMode = theme === 'dark';
     const [Ind, setInd] = useState(2);
-    const [Code, setCode] = useState(Languages[2].code);
+    const [Code, setCode] = useState("");
+    const [codename,setcodename]=useState("main");
+
+    useEffect(()=>{
+        const SessionCode = sessionStorage.getItem("code");
+        if (SessionCode) {
+            try {
+                let parsed = JSON.parse(SessionCode);
+                setCode(parsed.code);
+                setcodename(parsed.name);
+                let tempInd = Languages.findIndex(lang => lang.extension === parsed.extension);
+                if (tempInd !== -1) {
+                    setInd(tempInd);
+                }
+                
+            } catch (e) {
+                setCode(Languages[2].code);
+            }
+        }
+        else{
+            setCode(Languages[2].code);
+        }
+
+    },[])
+    
     const [IsRunning, setIsRunning] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [input, setinput] = useState('');
@@ -119,7 +143,6 @@ export default function PlayGround() {
         try {
             const response = await fetch(url, options);
             const result = await response.json();
-            console.log(result);
             return result;
         } catch (error) {
             console.error(error);
@@ -150,7 +173,12 @@ export default function PlayGround() {
         const currentLang = Languages[Ind];
         const codeNeedsInput = needsInput(Code, currentLang.lang);
         if (codeNeedsInput && input.trim() === "") {
-            alert("This code expects input, but no input was provided.");
+            Swal.fire({title:"Error",
+                text:"This code expects input, but no input was provided.",
+                icon:'error',
+                background:`${DarkMode?'black':'white'}`,
+                confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`
+            });
             setIsRunning(false);
             return;
         } else {
@@ -179,7 +207,67 @@ export default function PlayGround() {
         }
         setIsRunning(false);
     };
+    let SaveCode=async ()=>{
+        const token=localStorage.getItem("token") || sessionStorage.getItem("token");
+        if(sessionStorage.getItem("code")){
+            const data=JSON.parse(sessionStorage.getItem("code"));
 
+            const Response=await fetch("http://localhost:8000/api/updateCode",{
+                method:"POST",
+                headers:{
+                    'authorization':token,
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify({
+                    name:data.name,
+                    code:btoa(Code),
+                    extension:data.extension,
+                    _id:data._id,
+                })
+            })
+
+            const result=await Response.json();
+            if(result.status==="ok"){
+                alert("Code Saved Successfully");
+            }else{
+                alert("Unable To Save Code");
+            }
+            return;
+        }
+        if(token){
+            if(codename==="main"){
+                await Swal.fire({
+                        title: 'File Name',
+                        input: 'text',
+                        inputPlaceholder: 'Your file name here',
+                        showCancelButton: true,
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            setcodename(result.value)
+                        }
+                        });
+                }
+            const Response=await fetch("http://localhost:8000/api/pushCode",{
+                method:"POST",
+                headers:{
+                    'authorization':token,
+                    'Content-Type': 'application/json'
+
+                },
+                body:JSON.stringify({
+                    Code:btoa(Code),
+                    Date:new Date(),
+                    name:codename,
+                    extension:Languages[Ind].extension
+
+                })
+            })
+            const data=await Response.json();
+            sessionStorage.setItem("code",JSON.stringify(data.code));
+        }else{
+            alert("Login To Save Code");
+        }
+    }
     let Spinner = () => <div className="loader" style={{
         border: `3px solid ${DarkMode ? '#f3f3f3' : 'white'}`,
         borderTop: `3px solid ${DarkMode ? '#3498db' : 'gray'}`,
@@ -193,27 +281,27 @@ export default function PlayGround() {
         <div className={`h-screen flex flex-col overflow-hidden ${DarkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
             <PlayGroundHeader />
 
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
                 {/* Left Editor */}
-                <div className={`w-[60%] flex flex-col border-r-4 overflow-hidden ${DarkMode ? 'bg-gray-900 border-white' : 'bg-white border-black'}`}>
+                <div className={`w-full h-full md:w-[60%] flex flex-col border-r-0 md:border-r-4 overflow-hidden ${DarkMode ? 'bg-vscode md:border-white' : 'bg-white md:border-black'}`}>
                     <header className={`flex justify-end items-center p-2 border-2 border-t-0 border-r-0 ${DarkMode ? 'bg-gray-800 border-white' : 'bg-gray-200 border-black'}`}>
-                        <div className={`absolute left-2 p-3 border-r-2 ${DarkMode ? 'text-white border-white' : 'text-gray-700 border-black'}`}>
-                            main.{Languages[Ind].extension}
+                        <div className={`absolute left-2 p-3 border-r-2 ${DarkMode ? 'text-white border-white' : 'text-gray-700 border-black'} hidden md:block`}>
+                            {codename}.{Languages[Ind].extension}
                         </div>
 
                         <button className="mr-2 border-2 border-gray-500 p-1">
                             <WandSparkles color={DarkMode ? "#ffffff" : "#000000"} />
                         </button>
 
-                        <button className="mr-2 border-2 border-gray-500 p-1">
-                            <ArrowDownToLine color={DarkMode ? "#ffffff" : "#000000"} />
+                        <button className="mr-2 border-2 border-gray-500 p-1" onClick={()=>SaveCode()} >
+                            <Save color={DarkMode ? "#ffffff" : "#000000"} />
                         </button>
 
                         {/* Language Dropdown */}
                         <div className="relative text-sm sm:text-xs md:text-xs mr-2 h-9">
                             <button
                                 onClick={() => setIsOpen(!isOpen)}
-                                className={`w-52 ${DarkMode ? 'text-white bg-gray-800 hover:bg-gray-700 border-white' : 'text-gray-700 bg-gray-100 hover:bg-gray-200 border-black'} font-normal rounded px-2 py-1 text-left border`}
+                                className={`w-38 lg:w-52 ${DarkMode ? 'text-white bg-gray-800 hover:bg-gray-700 border-white' : 'text-gray-700 bg-gray-100 hover:bg-gray-200 border-black'} rounded px-2 py-1 text-left border`}
                             >
                                 {Languages[Ind].name}
                                 <svg className="w-2 h-7 inline ml-1" fill="none" viewBox="0 0 10 6">
@@ -233,6 +321,10 @@ export default function PlayGround() {
                                                         value={val.name}
                                                         checked={Ind === ind}
                                                         onChange={() => {
+                                                            if(sessionStorage.getItem("code")){
+                                                                sessionStorage.removeItem("code");
+                                                                setcodename("main")
+                                                            }
                                                             setInd(ind);
                                                             setCode(Languages[ind].code);
                                                             setIsOpen(false);
@@ -253,7 +345,7 @@ export default function PlayGround() {
                             {DarkMode ? <Sun color="#ffffff" /> : <Moon />}
                         </button>
 
-                        <button className={`${DarkMode ? 'bg-blue-700 hover:bg-blue-500' : 'bg-black hover:bg-gray-600'} p-2 w-16 h-9 text-white font-bold flex items-center justify-center mr-2`} onClick={runCode}>
+                        <button className={`${DarkMode ? 'bg-blue-700 hover:bg-blue-500' : 'bg-black hover:bg-gray-600'} p-2 w-12 h-9 sm:w-16 text-white font-bold flex items-center justify-center  sm:mr-2`} onClick={runCode}>
                             {IsRunning ? <Spinner /> : 'Run'}
                         </button>
                     </header>
@@ -273,9 +365,9 @@ export default function PlayGround() {
                     </div>
                 </div>
 
-                <div className={`w-[40%] flex flex-col ${DarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+                <div className={`w-full sm:w-[40%] h-full flex flex-col ${DarkMode ? 'bg-vscode' : 'bg-white'}`}>
                     {/* Input Box */}
-                    <div className={`h-[35%] ${DarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+                    <div className={`h-32 sm:h-[35%] ${DarkMode ? 'bg-gray-900' : 'bg-white'}`}>
                         <div className={`flex justify-between ${DarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700 items-center'} items-center`}>
                             <p className="text-base p-2 font-normal">Input</p>
                             <button className={`text-sm w-15 h-7 p-3 font-light cursor-pointer border-2 flex items-center justify-center mr-2 text-center  ${DarkMode ? 'text-white  border-gray-400' : 'text-black  border-gray-600'}`} onClick={() => setinput("")}>
@@ -291,7 +383,7 @@ export default function PlayGround() {
                     </div>
 
                     {/* Output Box */}
-                    <div className={`h-[65%] ${DarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+                    <div className={`h-64 sm:h-[65%] ${DarkMode ? 'bg-vscode' : 'bg-white'}`}>
                         <div className={`flex justify-between ${DarkMode ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'} flex-1 items-center`}>
                             <p className="text-base p-2 font-normal">Output</p>
                             <button className={`text-sm w-15 h-7 p-3 font-light cursor-pointer border-2 flex items-center justify-center mr-2 text-center  ${DarkMode ? 'text-white  border-gray-400' : 'text-black  border-gray-600'}`} onClick={() => setoutput("")}>

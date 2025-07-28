@@ -1,12 +1,14 @@
 import { useContext } from "react"
 import { ThemeContext } from "../contexts/ThemeContext"
-
+import { useNavigate } from "react-router-dom";
 export default function PlayGroundHeader() {
-  const {theme,settheme}=useContext(ThemeContext);
+      const navigate=useNavigate();
+
+  const {theme}=useContext(ThemeContext);
   const DarkMode=theme==='dark';
 
   return (
-    <header className={` border-b-2 h-16${DarkMode?'bg-black text-white border-white': 'bg-white text-black border-black'} `}>
+    <header className={` border-b-2 h-16${DarkMode?'bg-black text-white border-white': 'bg-white text-black border-black'} font-bold`}>
       <nav className="flex items-center justify-between p-4" aria-label="Global">
         
         {/* Logo */}
@@ -37,7 +39,8 @@ export default function PlayGroundHeader() {
           
           <a
             href="/login"
-            className={`text-white font-medium text-sm px-4 py-2 ${DarkMode?'bg-blue-600 hover:bg-blue-700':'bg-black hover:bg-gray-700'}`}
+            className={`text-white font-bold text-sm px-4 py-2 ${DarkMode?'bg-blue-600 hover:bg-blue-700':'bg-black hover:bg-gray-700'}`}
+            onClick={()=>navigate("/login")}
           >
             Login
           </a>

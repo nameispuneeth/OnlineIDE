@@ -1,9 +1,11 @@
 import { useContext, useState,useRef } from "react";
 import { ThemeContext } from "../../contexts/ThemeContext";
 import { CircleAlert } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 
 
 export default function Register() {
+    const navigate=useNavigate();
     const { theme } = useContext(ThemeContext);
     const DarkMode = theme === 'dark';
     const [email,setemail]=useState('');
@@ -46,7 +48,7 @@ export default function Register() {
         <div className="h-screen bg-black">
             <div className="flex justify-center items-center h-full w-full">
                 <div className={`${DarkMode ? 'bg-vscode' : 'bg-white'} p-6 rounded shadow-md`}>
-                    <p className="flex justify-center mb-10 font-extrabold text-5xl text-blue-700">Register</p>
+                    <p className={`flex justify-center mb-10 font-extrabold text-5xl ${DarkMode?'text-blue-700':'text-black'} `}>Register</p>
                     <form onSubmit={HandleSubmission}> 
                         <input
                         type="text"
@@ -81,9 +83,9 @@ export default function Register() {
                         className={`w-full p-2 border-3 mb-9 rounded ${DarkMode ? 'border-gray-700 bg-transparent text-gray-400' : 'border-vscode text-black'}`}
                         required
                     />
-                    <input type="submit" value="Register" className={`w-full p-2 border-2 font-semibold mb-5 text-white ${DarkMode?'border-blue-700 hover:bg-blue-500 bg-blue-700 ':'border-black hover:bg-gray-700 bg-black' }`}></input>
+                    <input type="submit" value="Register" className={`w-full p-2 border-2 font-semibold mb-5 text-white ${DarkMode?'border-blue-700 hover:bg-blue-500 bg-blue-700 ':'border-black hover:bg-gray-900 bg-black' }`}></input>
                     {Invalid && ErrorMsg()} 
-                    <p className="flex justify-center font-light text-sm text-white">Already Have An Account ?    <span className="ml-1 cursor-pointer font-semibold text-blue-500">Login</span>
+                    <p className={`flex justify-center font-light text-sm ${DarkMode?'text-white':'text-black'}`}>Already Have An Account ?    <span className={`ml-1 cursor-pointer font-semibold ${DarkMode?'text-blue-500':'text-gray-800'}`} onClick={()=>navigate("/login")}>Login</span>
  </p>
                     </form>
                 </div>

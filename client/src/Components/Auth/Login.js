@@ -1,15 +1,19 @@
 import { useContext, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../../contexts/ThemeContext";
 import { CircleAlert } from 'lucide-react';
 
 
 export default function Login() {
+    const navigate=useNavigate();
     const { theme } = useContext(ThemeContext);
     const DarkMode = theme === 'dark';
     const errorMsg=useRef('');
     const [email, setemail] = useState('');
     const [pwd, setpwd] = useState('');
     const [Invalid, setInvalid] = useState(false);
+    const [checked,setChecked]=useState(false);
+    
     let HandleSubmission = async (e) => {
         e.preventDefault();
 
@@ -26,9 +30,10 @@ export default function Login() {
         let data = await Response.json();
 
         if (data.status === 'ok') {
-            localStorage.setItem('myToken',data.token);
-            //Navigate To Home.js
-            alert("User Exists");
+
+            if(checked) localStorage.setItem('token', data.token);
+            else sessionStorage.setItem('token',data.token);
+            navigate("/userhome")
         } else {
             setInvalid(true);
             errorMsg.current=data.error;
@@ -46,7 +51,7 @@ export default function Login() {
         <div className="h-screen bg-black">
             <div className="flex justify-center items-center h-full w-full">
                 <div className={`${DarkMode ? 'bg-vscode' : 'bg-white'} p-6 rounded shadow-md`}>
-                    <p className="flex justify-center mb-10 font-extrabold text-5xl text-blue-700">LOGIN</p>
+                    <p className={`flex justify-center mb-10 font-extrabold text-5xl ${DarkMode?'text-blue-700':'text-black'}`}>LOGIN</p>
                     <form onSubmit={HandleSubmission}>
                         <input
                             type="email"
@@ -70,11 +75,15 @@ export default function Login() {
                             className={`w-full p-2 border-3 mb-9 rounded ${DarkMode ? 'border-gray-700 bg-transparent text-gray-400' : 'border-vscode text-black'}`}
                             required
                         />
+                        <div className="flex items-center mb-4">
+                            <input id="checked-checkbox" type="checkbox" checked={checked} onChange={(e)=>setChecked(e.target.checked)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                            <p className={`ms-2 text-sm font-medium ${DarkMode?'text-gray-300':'text-gray-900'}`}>Remember Me</p>
+                        </div>
                         <input type="submit" value="Login" className={`w-full p-2 border-2 font-semibold mb-5 text-white ${DarkMode ? 'border-blue-700 hover:bg-blue-500 bg-blue-700 ' : 'border-black hover:bg-gray-700 bg-black'}`}></input>
 
                         {Invalid && ErrorMsg()}
 
-                        <p className="flex justify-center font-light text-sm text-white">Don't Have An Account ?  <span className="ml-1 cursor-pointer font-semibold text-blue-500"> Register </span> </p>
+                        <p className={`flex justify-center font-light text-sm ${DarkMode?'text-white' : 'text-black'}`}>Don't Have An Account ?  <span className={`ml-1 cursor-pointer font-semibold ${DarkMode?'text-blue-500':'text-gray-800'}`} onClick={()=>navigate("/register")}> Register </span> </p>
                     </form>
                 </div>
             </div>
