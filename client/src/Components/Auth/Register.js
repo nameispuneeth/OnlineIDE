@@ -2,7 +2,7 @@ import { useContext, useState,useRef } from "react";
 import { ThemeContext } from "../../contexts/ThemeContext";
 import { CircleAlert } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
-
+import Swal from "sweetalert2";
 
 export default function Register() {
     const navigate=useNavigate();
@@ -30,7 +30,19 @@ export default function Register() {
         console.log(data);
 
         if(data.status==='ok'){
-            //Navigate To Home.js
+           Swal.fire({
+                title: "Sign Up Successful!",
+                text: "You have successfully created your account.",
+                icon: "success",
+                confirmButtonText: "Continue",
+               background:`${DarkMode?'#1e1e1e':'white'}`,
+                confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`
+            }).then((result)=>{
+                if(result.isConfirmed){
+                    navigate("/login")
+                }
+            });
+
         }else{
             setInvalid(true);
             Error.current=data.error;

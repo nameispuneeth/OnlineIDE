@@ -58,7 +58,11 @@ import Swal from 'sweetalert2';
 
         }
     ];
+    const ApiKey = process.env.REACT_APP_API_KEY_GET;
+
+
 export default function PlayGround() {
+
     const { theme, setTheme } = useContext(ThemeContext);
     const DarkMode = theme === 'dark';
     const [Ind, setInd] = useState(2);
@@ -104,7 +108,7 @@ export default function PlayGround() {
         const options = {
             method: 'POST',
             headers: {
-                'x-rapidapi-key': '1f57df6755msh40eb8b15b1bdd58p127c32jsnc39b6e226f90',
+                'x-rapidapi-key': ApiKey,
                 'x-rapidapi-host': 'judge0-ce.p.rapidapi.com',
                 'Content-Type': 'application/json'
             },
@@ -135,7 +139,7 @@ export default function PlayGround() {
         const options = {
             method: 'GET',
             headers: {
-                'x-rapidapi-key': '1f57df6755msh40eb8b15b1bdd58p127c32jsnc39b6e226f90',
+                'x-rapidapi-key': ApiKey,
                 'x-rapidapi-host': 'judge0-ce.p.rapidapi.com'
             }
         };
