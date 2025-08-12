@@ -69,12 +69,14 @@ export default function PlayGround() {
     const [Code, setCode] = useState("");
     const [codename,setcodename]=useState("main");
 
+    const [AiLoading,setAiLoading]=useState(false);
+
     useEffect(()=>{
         const SessionCode = sessionStorage.getItem("code");
         if (SessionCode) {
             try {
                 let parsed = JSON.parse(SessionCode);
-                setCode(parsed.code);
+                setCode(atob(parsed.code));
                 setcodename(parsed.name);
                 let tempInd = Languages.findIndex(lang => lang.extension === parsed.extension);
                 if (tempInd !== -1) {
@@ -250,6 +252,8 @@ export default function PlayGround() {
                         input: 'text',
                         inputPlaceholder: 'Your file name here',
                         showCancelButton: true,
+                        background:`${DarkMode?'black':'white'}`,
+                        confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`
                         }).then((result) => {
                         if (result.isConfirmed) {
                             setcodename(result.value)
@@ -286,6 +290,66 @@ export default function PlayGround() {
         animation: 'spin 1s linear infinite'
     }}></div>;
 
+    let getAiData = async ( prompt, share) => {
+    setAiLoading(true);
+    const Response = await fetch("http://localhost:8000/api/AiData", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            Prompt: prompt,
+            Language: Languages[Ind].lang,
+            Code: share ? Code : Languages[Ind].code
+        })
+    });
+    const data = await Response.json();
+    if (data.status !== "error") {
+        const cleaned = data.result
+            .replace(/^```[a-zA-Z0-9]*\n/, '')
+            .replace(/```$/, '')
+            .trim();
+        setCode(cleaned);
+    }
+    setAiLoading(false);
+};
+
+    let AiAlert=()=>{
+        Swal.fire({
+        title: "Enter Prompt",
+        html: `
+            <textarea id="my-textarea" rows="2" class="swal2-textarea" placeholder="Type here..."></textarea>
+            <br/>
+            <label>
+            <input type="checkbox" id="my-checkbox" />
+            &nbsp;Share My Code
+            </label>
+        `,
+        focusConfirm: false,
+        background:`${DarkMode?'#1e1e1e':'white'}`,
+        confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`,
+        preConfirm: () => {
+            
+            const textareaValue = document.getElementById("my-textarea").value;
+            const checkboxChecked = document.getElementById("my-checkbox").checked;
+
+            if (!textareaValue) {
+                Swal.showValidationMessage("Prompt is required");
+                return false;
+            }
+
+            return { textareaValue, checkboxChecked };
+        }
+        }).then((result) => {
+        if (result.isConfirmed) {
+            const promptValue = result.value.textareaValue;
+            const shareValue = result.value.checkboxChecked;
+            
+            getAiData(promptValue, shareValue);
+}
+        }
+        );
+
+    }
+
     return (
         <div className={`h-screen flex flex-col overflow-hidden ${DarkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
             <PlayGroundHeader />
@@ -298,7 +362,7 @@ export default function PlayGround() {
                             {codename}.{Languages[Ind].extension}
                         </div>
 
-                        <button className="mr-2 border-2 border-gray-500 p-1">
+                        <button className="mr-2 border-2 border-gray-500 p-1" onClick={()=>AiAlert()}>
                             <WandSparkles color={DarkMode ? "#ffffff" : "#000000"} />
                         </button>
 
@@ -360,7 +424,8 @@ export default function PlayGround() {
                     </header>
 
                     {/* Editor */}
-                    <div className="w-full flex flex-1">
+                    <div className="w-full flex flex-1 bg-vscode justify-center items-center">
+                        {AiLoading ?<Spinner/>: 
                         <Editor
                             key={Ind}
                             height="100%"
@@ -371,6 +436,7 @@ export default function PlayGround() {
                             onChange={(val) => setCode(val)}
                             theme={DarkMode ? 'vs-dark' : 'vs-light'}
                         />
+}
                     </div>
                 </div>
 

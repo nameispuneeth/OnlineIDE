@@ -1,6 +1,7 @@
 const express=require('express');
 const app=express();
 require('dotenv').config();
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const mongoose=require('mongoose');
 const User=require('./models/user.model');
@@ -13,6 +14,9 @@ app.use(cors());
 app.use(express.json())
 
 mongoose.connect('mongodb://localhost:27017/ONLINEIDE')
+const genAi=new GoogleGenerativeAI(process.env.apiKey);
+const model=genAi.getGenerativeModel({model:'gemini-2.0-flash'});
+
 const secretcode=process.env.secretCode;
 app.get('/',(req,res)=>{
     res.send("<h1>Hello World</h1>");
@@ -177,6 +181,18 @@ app.post("/api/deleteData",async (req,res)=>{
         res.send({status:'ok'})
     }catch{
         res.send({status:'error',error:"Session Time Expired"})
+    }
+})
+
+app.post('/api/AiData',async(req,res)=>{
+    try{
+        const result=await model.generateContent("For This Prompt : "+req.body.Prompt+"\t In "+req.body.Language+"\t With This Code"+req.body.Code+"Just Give Me The Code Only");
+        const aiResponse =
+        result.response.candidates?.[0]?.content?.parts?.[0]?.text || "No output";
+        res.send({ status: "ok", result: aiResponse });
+    }
+    catch{
+       res.send({status:'error',error:"Network Issue"}) ;
     }
 })
 
