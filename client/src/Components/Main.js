@@ -67,7 +67,7 @@ export default function PlayGround() {
     const DarkMode = theme === 'dark';
     const [Ind, setInd] = useState(2);
     const [Code, setCode] = useState("");
-    const [codename,setcodename]=useState("main");
+    const codename=useRef("main");
 
     const [AiLoading,setAiLoading]=useState(false);
 
@@ -77,7 +77,7 @@ export default function PlayGround() {
             try {
                 let parsed = JSON.parse(SessionCode);
                 setCode(atob(parsed.code));
-                setcodename(parsed.name);
+                codename.current=parsed.name;
                 let tempInd = Languages.findIndex(lang => lang.extension === parsed.extension);
                 if (tempInd !== -1) {
                     setInd(tempInd);
@@ -239,24 +239,34 @@ export default function PlayGround() {
 
             const result=await Response.json();
             if(result.status==="ok"){
-                alert("Code Saved Successfully");
+                Swal.fire({
+                    title:"Success",
+                    icon:'success',
+                    text: 'File Saved Successfully',  
+                    confirmButtonText: 'Ok',
+                    confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`,
+                    background:`${DarkMode?'#241f1f':'white'}`,
+                })
             }else{
                 alert("Unable To Save Code");
             }
             return;
         }
         if(token){
-            if(codename==="main"){
+            if(codename.current==="main"){
                 await Swal.fire({
                         title: 'File Name',
                         input: 'text',
                         inputPlaceholder: 'Your file name here',
                         showCancelButton: true,
-                        background:`${DarkMode?'black':'white'}`,
+                        background:`${DarkMode?'#241f1f':'white'}`,
+                        cancelButtonText:'Save As Main',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false, 
                         confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`
                         }).then((result) => {
                         if (result.isConfirmed) {
-                            setcodename(result.value)
+                            codename.current=result.value;
                         }
                         });
                 }
@@ -270,7 +280,7 @@ export default function PlayGround() {
                 body:JSON.stringify({
                     Code:btoa(Code),
                     Date:new Date(),
-                    name:codename,
+                    name:codename.current,
                     extension:Languages[Ind].extension
 
                 })
@@ -359,7 +369,7 @@ export default function PlayGround() {
                 <div className={`w-full h-full md:w-[60%] flex flex-col border-r-0 md:border-r-4 overflow-hidden ${DarkMode ? 'bg-vscode md:border-white' : 'bg-white md:border-black'}`}>
                     <header className={`flex justify-end items-center p-2 border-2 border-t-0 border-r-0 ${DarkMode ? 'bg-gray-800 border-white' : 'bg-gray-200 border-black'}`}>
                         <div className={`absolute left-2 p-3 border-r-2 ${DarkMode ? 'text-white border-white' : 'text-gray-700 border-black'} hidden md:block`}>
-                            {codename}.{Languages[Ind].extension}
+                            {codename.current}.{Languages[Ind].extension}
                         </div>
 
                         <button className="mr-2 border-2 border-gray-500 p-1" onClick={()=>AiAlert()}>
@@ -396,7 +406,7 @@ export default function PlayGround() {
                                                         onChange={() => {
                                                             if(sessionStorage.getItem("code")){
                                                                 sessionStorage.removeItem("code");
-                                                                setcodename("main")
+                                                                codename.current="main";
                                                             }
                                                             setInd(ind);
                                                             setCode(Languages[ind].code);

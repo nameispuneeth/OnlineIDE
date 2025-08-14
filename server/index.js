@@ -79,6 +79,8 @@ app.post("/api/pushCode",async (req,res)=>{
 
     try{
         const data=jwt.verify(token,secretcode);
+            console.log(req.body);
+
         const newCode = {
             _id: new ObjectId(),
             code: req.body.Code,
@@ -142,8 +144,8 @@ app.post("/api/updateTitle", async (req, res) => {
   const token = req.headers['authorization'];
   try {
     const verify = jwt.verify(token, secretcode);
-
-
+    
+    console.log(req.body);
     const result = await User.updateOne(
       { email: verify.email, "codes._id": new ObjectId(req.body._id) },
       {
@@ -153,6 +155,8 @@ app.post("/api/updateTitle", async (req, res) => {
         }
       }
     );
+        console.log(result);
+
     res.send({ status: "ok" });
 
   } catch (err) {
