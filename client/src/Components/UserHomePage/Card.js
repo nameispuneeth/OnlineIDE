@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../../contexts/ThemeContext";
 import { useContext,useState } from "react";
 import { Pencil,Trash2,ArrowDownToLine } from "lucide-react";
+import Swal from "sweetalert2";
 
 export default function Card({data,handleDelete}) {
     const navigate=useNavigate();
@@ -17,7 +18,9 @@ export default function Card({data,handleDelete}) {
         const encodedData = {
         ...data,
         code: atob(data.code),
+        
         };
+
         sessionStorage.setItem("code",JSON.stringify(encodedData));
         navigate("/")
     }
@@ -25,6 +28,7 @@ export default function Card({data,handleDelete}) {
         setchangeName(true);
     }
     let ChangeName=async ()=>{
+        if(localStorage.getItem("code")!=null)  sessionStorage.removeItem("code");
         let token=localStorage.getItem('token') || sessionStorage.getItem('token');
         if(token){
             setchangeName(false);
@@ -44,7 +48,13 @@ export default function Card({data,handleDelete}) {
             let gotData=await Response.json();
 
             if(gotData.status==="ok"){
-                alert("SuccessFull Updation");
+                Swal.fire({
+                    title:'Success',
+                    icon:'success',
+                    text:'SuccessFull Updation Of FileName',
+                    timer:4000,
+                    background:`${DarkMode?'#2E2E2E':'white'}`
+                })
                 setCurrTitle(title);
             }else{
                 alert(gotData.error);

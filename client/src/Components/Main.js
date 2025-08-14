@@ -76,7 +76,8 @@ export default function PlayGround() {
         if (SessionCode) {
             try {
                 let parsed = JSON.parse(SessionCode);
-                setCode(atob(parsed.code));
+                setCode(parsed.code);
+                console.log(parsed.code);
                 codename.current=parsed.name;
                 let tempInd = Languages.findIndex(lang => lang.extension === parsed.extension);
                 if (tempInd !== -1) {
@@ -216,13 +217,14 @@ export default function PlayGround() {
     let SaveCode=async ()=>{
         const token=localStorage.getItem("token") || sessionStorage.getItem("token");
         const stored = sessionStorage.getItem("code");
+        console.log(stored);
         if(!token){
             alert("Login To Save Code");
             return;
         }
         else if(stored  && stored !== "undefined"){
             const data=JSON.parse(stored);
-
+            
             const Response=await fetch("http://localhost:8000/api/updateCode",{
                 method:"POST",
                 headers:{

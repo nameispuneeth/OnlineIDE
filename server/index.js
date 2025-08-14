@@ -24,10 +24,8 @@ app.get('/',(req,res)=>{
 
 app.post('/api/login',async (req,res)=>{
     let data=req.body;
-    console.log(data)
     try{
         const user=await User.findOne({email:data.email});
-        console.log(user);
         if(user){
             let PassComp=await bcrypt.compare(data.pwd,user.password);
             if(PassComp){
@@ -36,7 +34,6 @@ app.post('/api/login',async (req,res)=>{
                     email:user.email
                 },secretcode)
 
-                console.log(token);
                 res.json({status:'ok',token});
             }
             else{
@@ -79,7 +76,6 @@ app.post("/api/pushCode",async (req,res)=>{
 
     try{
         const data=jwt.verify(token,secretcode);
-            console.log(req.body);
 
         const newCode = {
             _id: new ObjectId(),
@@ -120,7 +116,6 @@ app.post("/api/updateCode", async (req, res) => {
   try {
     const verify = jwt.verify(token, secretcode);
 
-
     const result = await User.updateOne(
       { email: verify.email, "codes._id": new ObjectId(req.body._id) },
       {
@@ -145,7 +140,6 @@ app.post("/api/updateTitle", async (req, res) => {
   try {
     const verify = jwt.verify(token, secretcode);
     
-    console.log(req.body);
     const result = await User.updateOne(
       { email: verify.email, "codes._id": new ObjectId(req.body._id) },
       {
@@ -155,7 +149,6 @@ app.post("/api/updateTitle", async (req, res) => {
         }
       }
     );
-        console.log(result);
 
     res.send({ status: "ok" });
 
