@@ -9,7 +9,7 @@ export default function Card({data,handleDelete}) {
     const date=new Date(data.date).toLocaleDateString();
     const language=data.extension
     const {theme}=useContext(ThemeContext);
-    let [CurrTitle,setCurrTitle]=useState(data.name);
+    const [CurrTitle,setCurrTitle]=useState(data.name);
     const [changeName,setchangeName]=useState(false);
     const [title,settitle]=useState(data.name);
     const DarkMode=theme==='dark';
@@ -64,7 +64,7 @@ export default function Card({data,handleDelete}) {
 
     }
 
-    let DeleteData=async ()=>{
+    let DeleteHelper=async ()=>{
         sessionStorage.removeItem("code");
         const token=localStorage.getItem("token")||sessionStorage.getItem("token");
         if(token){
@@ -82,9 +82,51 @@ export default function Card({data,handleDelete}) {
             if(res.status==="ok"){
                 handleDelete(data._id);
             }else{
-
+                Swal.fire({
+                    title:"Error",
+                    icon:"error",
+                    text:"Unable To Delete",
+                    timer:3000
+                })
             }
         }
+            
+    }
+    let DeleteData=async ()=>{
+        Swal.fire({
+            title:"Are You Sure ? ",
+            icon:"warning",
+            text:"This File Will Deleted Permanently",
+            showCancelButton:true,
+            showConfirmButton:true,
+            confirmButtonText:"Yes",
+            cancelButtonText:"No",
+            confirmButtonColor:"red",
+            cancelButtonColor:"gray",
+        }).then(async (result)=>{
+            if(result.isConfirmed){
+                Swal.fire({
+                    title:"Re-enter Your CodeName To Delete",
+                    input:"text",
+                    inputPlaceholder:"Enter Your Code Name",
+                    showCancelButton:true,
+                    showConfirmButton:true,
+                    confirmButtonText:"Delete",
+                    confirmButtonColor:"red",
+                    preConfirm:()=>{
+                        if(Swal.getInput().value!== CurrTitle){
+                            Swal.showValidationMessage("Different Code Name");
+                            return false;
+                        } 
+                    }
+                }).then(async (result)=>{
+                    if(result.value===CurrTitle) await DeleteHelper();
+                    
+                })
+            }     
+        }
+        )
+        
     }
     let inputFunc=()=>{
         return(
