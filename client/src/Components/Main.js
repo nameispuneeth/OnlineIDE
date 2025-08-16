@@ -1,4 +1,4 @@
-import { useContext, useRef, useState,useEffect } from "react";
+import { useContext, useRef, useState, useEffect } from "react";
 import { ThemeContext } from "../contexts/ThemeContext";
 import PlayGroundHeader from "./PlayGroundHeader";
 import { Sun, Moon, Save, WandSparkles } from 'lucide-react';
@@ -6,59 +6,59 @@ import Editor from '@monaco-editor/react';
 import "../App.css";
 import Swal from 'sweetalert2';
 
- const Languages = [
-        {
-            id: 92,
-            name: "Python (3.11.2)",
-            code: `print("Hello, World!")`,
-            extension: "py",
-            lang: "python"
-        },
-        {
-            id: 91,
-            name: "Java (JDK 17.0.6)",
-            code: `public class Main {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, World!");\n\t}\n}`,
-            extension: "java",
-            lang: "python"
-        },
-        {
-            id: 105,
-            name: "C++ (GCC 14.1.0)",
-            code: `#include <iostream>\nint main() {\n\tstd::cout << "Hello, World!" << std::endl;\n\treturn 0;\n}`,
-            extension: "cpp",
-            lang: "cpp"
-        },
-        {
-            id: 103,
-            name: "C (GCC 14.1.0)",
-            code: `#include <stdio.h>\nint main() {\n\tprintf("Hello, World!\\n");\n\treturn 0;\n}`,
-            extension: "c",
-            lang: "c"
-        },
-        {
-            id: 97,
-            name: "JavaScript (20.17.0)",
-            code: `console.log("Hello, World!");`,
-            extension: "js",
-            lang: "javascript"
-        },
-        {
-            id: 106,
-            name: "Go (1.22.0)",
-            code: `package main\nimport "fmt"\nfunc main() {\n\tfmt.Println("Hello, World!")\n}`,
-            extension: "go",
-            lang: "go"
-        },
-        {
-            id: 83,
-            name: "Swift (5.2.3)",
-            code: `print("Hello, World!")`,
-            extension: "swift",
-            lang: "swift"
+const Languages = [
+    {
+        id: 92,
+        name: "Python (3.11.2)",
+        code: `print("Hello, World!")`,
+        extension: "py",
+        lang: "python"
+    },
+    {
+        id: 91,
+        name: "Java (JDK 17.0.6)",
+        code: `public class Main {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, World!");\n\t}\n}`,
+        extension: "java",
+        lang: "python"
+    },
+    {
+        id: 105,
+        name: "C++ (GCC 14.1.0)",
+        code: `#include <iostream>\nint main() {\n\tstd::cout << "Hello, World!" << std::endl;\n\treturn 0;\n}`,
+        extension: "cpp",
+        lang: "cpp"
+    },
+    {
+        id: 103,
+        name: "C (GCC 14.1.0)",
+        code: `#include <stdio.h>\nint main() {\n\tprintf("Hello, World!\\n");\n\treturn 0;\n}`,
+        extension: "c",
+        lang: "c"
+    },
+    {
+        id: 97,
+        name: "JavaScript (20.17.0)",
+        code: `console.log("Hello, World!");`,
+        extension: "js",
+        lang: "javascript"
+    },
+    {
+        id: 106,
+        name: "Go (1.22.0)",
+        code: `package main\nimport "fmt"\nfunc main() {\n\tfmt.Println("Hello, World!")\n}`,
+        extension: "go",
+        lang: "go"
+    },
+    {
+        id: 83,
+        name: "Swift (5.2.3)",
+        code: `print("Hello, World!")`,
+        extension: "swift",
+        lang: "swift"
 
-        }
-    ];
-    const ApiKey = process.env.REACT_APP_API_KEY_GET;
+    }
+];
+const ApiKey = process.env.REACT_APP_API_KEY_GET;
 
 
 export default function PlayGround() {
@@ -67,33 +67,33 @@ export default function PlayGround() {
     const DarkMode = theme === 'dark';
     const [Ind, setInd] = useState(2);
     const [Code, setCode] = useState("");
-    const codename=useRef("main");
+    const codename = useRef("main");
 
-    const [AiLoading,setAiLoading]=useState(false);
+    const [AiLoading, setAiLoading] = useState(false);
 
-    useEffect(()=>{
+    useEffect(() => {
         const SessionCode = sessionStorage.getItem("code");
         if (SessionCode) {
             try {
                 let parsed = JSON.parse(SessionCode);
                 setCode(parsed.code);
                 console.log(parsed.code);
-                codename.current=parsed.name;
+                codename.current = parsed.name;
                 let tempInd = Languages.findIndex(lang => lang.extension === parsed.extension);
                 if (tempInd !== -1) {
                     setInd(tempInd);
                 }
-                
+
             } catch (e) {
                 setCode(Languages[2].code);
             }
         }
-        else{
+        else {
             setCode(Languages[2].code);
         }
 
-    },[])
-    
+    }, [])
+
     const [IsRunning, setIsRunning] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [input, setinput] = useState('');
@@ -180,11 +180,12 @@ export default function PlayGround() {
         const currentLang = Languages[Ind];
         const codeNeedsInput = needsInput(Code, currentLang.lang);
         if (codeNeedsInput && input.trim() === "") {
-            Swal.fire({title:"Error",
-                text:"This code expects input, but no input was provided.",
-                icon:'error',
-                background:`${DarkMode?'black':'white'}`,
-                confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`
+            Swal.fire({
+                title: "Error",
+                text: "This code expects input, but no input was provided.",
+                icon: 'error',
+                background: `${DarkMode ? '#1e1e1e' : 'white'}`,
+                confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`
             });
             setIsRunning(false);
             return;
@@ -214,82 +215,96 @@ export default function PlayGround() {
         }
         setIsRunning(false);
     };
-    let SaveCode=async ()=>{
-        const token=localStorage.getItem("token") || sessionStorage.getItem("token");
+    let SaveCode = async () => {
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
         const stored = sessionStorage.getItem("code");
         console.log(stored);
-        if(!token){
+        if (!token) {
             alert("Login To Save Code");
             return;
         }
-        else if(stored  && stored !== "undefined"){
-            const data=JSON.parse(stored);
-            
-            const Response=await fetch("http://localhost:8000/api/updateCode",{
-                method:"POST",
-                headers:{
-                    'authorization':token,
+        else if (stored && stored !== "undefined") {
+            const data = JSON.parse(stored);
+
+            const Response = await fetch("http://localhost:8000/api/updateCode", {
+                method: "POST",
+                headers: {
+                    'authorization': token,
                     'Content-Type': 'application/json'
                 },
-                body:JSON.stringify({
-                    name:data.name,
-                    code:btoa(Code),
-                    extension:data.extension,
-                    _id:data._id,
+                body: JSON.stringify({
+                    name: data.name,
+                    code: btoa(Code),
+                    extension: data.extension,
+                    _id: data._id,
                 })
             })
 
-            const result=await Response.json();
-            if(result.status==="ok"){
+            const result = await Response.json();
+            if (result.status === "ok") {
                 Swal.fire({
-                    title:"Success",
-                    icon:'success',
-                    text: 'File Saved Successfully',  
+                    title: `<span style="color:${DarkMode ? 'white' : 'black'}">Success</span>`,
+                    icon: 'success',
+                    text: 'File Saved Successfully',
                     confirmButtonText: 'Ok',
-                    confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`,
-                    background:`${DarkMode?'#241f1f':'white'}`,
-                })
-            }else{
+                    confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`,
+                    background: `${DarkMode ? '#1e1e1e' : 'white'}`,
+                    color: `${DarkMode ? 'white' : 'black'}`,
+                    customClass: {
+                        popup: 'swal-custom-popup',
+                    }
+                });
+
+            } else {
                 alert("Unable To Save Code");
             }
             return;
         }
-        if(token){
-            if(codename.current==="main"){
+        if (token) {
+            if (codename.current === "main") {
                 await Swal.fire({
-                        title: 'File Name',
-                        input: 'text',
-                        inputPlaceholder: 'Your file name here',
-                        showCancelButton: true,
-                        background:`${DarkMode?'#241f1f':'white'}`,
-                        cancelButtonText:'Save As Main',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false, 
-                        confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`
-                        }).then((result) => {
-                        if (result.isConfirmed) {
-                            codename.current=result.value;
-                        }
-                        });
-                }
-            const Response=await fetch("http://localhost:8000/api/pushCode",{
-                method:"POST",
-                headers:{
-                    'authorization':token,
+                    title: `<span style="color:${DarkMode ? 'white' : 'black'}">File Name</span>`,
+                    input: 'text',
+                    inputPlaceholder: 'Your file name here',
+                    inputAttributes: {
+                        style: `
+            background:${DarkMode ? '#1e1e1e' : 'white'};
+            color:${DarkMode ? 'white' : 'black'};
+            border:1px solid ${DarkMode ? '#444' : '#ccc'};
+        `
+                    },
+                    showCancelButton: true,
+                    cancelButtonText: 'Save As Main',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    background: `${DarkMode ? '#1e1e1e' : 'white'}`,
+                    color: `${DarkMode ? 'white' : 'black'}`,
+                    confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        codename.current = result.value;
+                    }
+                });
+
+            }
+            const Response = await fetch("http://localhost:8000/api/pushCode", {
+                method: "POST",
+                headers: {
+                    'authorization': token,
                     'Content-Type': 'application/json'
 
                 },
-                body:JSON.stringify({
-                    Code:btoa(Code),
-                    Date:new Date(),
-                    name:codename.current,
-                    extension:Languages[Ind].extension
+                body: JSON.stringify({
+                    Code: btoa(Code),
+                    Date: new Date(),
+                    name: codename.current,
+                    extension: Languages[Ind].extension
 
                 })
             })
-            const data=await Response.json();
-            sessionStorage.setItem("code",JSON.stringify(data.code));
-        }else{
+            const data = await Response.json();
+            sessionStorage.setItem("code", data.code);
+        } else {
             alert("Login To Save Code");
         }
     }
@@ -302,63 +317,68 @@ export default function PlayGround() {
         animation: 'spin 1s linear infinite'
     }}></div>;
 
-    let getAiData = async ( prompt, share) => {
-    setAiLoading(true);
-    const Response = await fetch("http://localhost:8000/api/AiData", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            Prompt: prompt,
-            Language: Languages[Ind].lang,
-            Code: share ? Code : Languages[Ind].code
-        })
-    });
-    const data = await Response.json();
-    if (data.status !== "error") {
-        const cleaned = data.result
-            .replace(/^```[a-zA-Z0-9]*\n/, '')
-            .replace(/```$/, '')
-            .trim();
-        setCode(cleaned);
-    }
-    setAiLoading(false);
-};
+    let getAiData = async (prompt, share) => {
+        setAiLoading(true);
+        const Response = await fetch("http://localhost:8000/api/AiData", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                Prompt: prompt,
+                Language: Languages[Ind].lang,
+                Code: share ? Code : Languages[Ind].code
+            })
+        });
+        const data = await Response.json();
+        if (data.status !== "error") {
+            const cleaned = data.result
+                .replace(/^```[a-zA-Z0-9]*\n/, '')
+                .replace(/```$/, '')
+                .trim();
+            setCode(cleaned);
+        }
+        setAiLoading(false);
+    };
 
-    let AiAlert=()=>{
+    let AiAlert = () => {
         Swal.fire({
-        title: "Enter Prompt",
-        html: `
-            <textarea id="my-textarea" rows="2" class="swal2-textarea" placeholder="Type here..."></textarea>
+            title: `<span style="color:${DarkMode ? 'white' : 'black'}">Enter Prompt</span>`,
+            html: `
+            <textarea id="my-textarea" rows="2" class="swal2-textarea" 
+                style="background:${DarkMode ? '#2d2d2d' : 'white'};
+                       color:${DarkMode ? 'white' : 'black'};
+                       border:1px solid ${DarkMode ? '#444' : '#ccc'};
+                       resize:none;" 
+                placeholder="Type here..."></textarea>
             <br/>
-            <label>
-            <input type="checkbox" id="my-checkbox" />
-            &nbsp;Share My Code
+            <label style="color:${DarkMode ? 'white' : 'black'}; font-size:14px;">
+                <input type="checkbox" id="my-checkbox" 
+                    style="accent-color:${DarkMode ? '#1d4ed8' : 'black'};" />
+                &nbsp;Share My Code
             </label>
         `,
-        focusConfirm: false,
-        background:`${DarkMode?'#1e1e1e':'white'}`,
-        confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`,
-        preConfirm: () => {
-            
-            const textareaValue = document.getElementById("my-textarea").value;
-            const checkboxChecked = document.getElementById("my-checkbox").checked;
+            focusConfirm: false,
+            background: `${DarkMode ? '#1e1e1e' : 'white'}`,
+            confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`,
+            preConfirm: () => {
+                const textareaValue = document.getElementById("my-textarea").value;
+                const checkboxChecked = document.getElementById("my-checkbox").checked;
 
-            if (!textareaValue) {
-                Swal.showValidationMessage("Prompt is required");
-                return false;
+                if (!textareaValue) {
+                    Swal.showValidationMessage("Prompt is required");
+                    return false;
+                }
+
+                return { textareaValue, checkboxChecked };
             }
-
-            return { textareaValue, checkboxChecked };
-        }
         }).then((result) => {
-        if (result.isConfirmed) {
-            const promptValue = result.value.textareaValue;
-            const shareValue = result.value.checkboxChecked;
-            
-            getAiData(promptValue, shareValue);
-}
-        }
-        );
+            if (result.isConfirmed) {
+                const promptValue = result.value.textareaValue;
+                const shareValue = result.value.checkboxChecked;
+
+                getAiData(promptValue, shareValue);
+            }
+        });
+
 
     }
 
@@ -374,11 +394,11 @@ export default function PlayGround() {
                             {codename.current}.{Languages[Ind].extension}
                         </div>
 
-                        <button className="mr-2 border-2 border-gray-500 p-1" onClick={()=>AiAlert()}>
+                        <button className="mr-2 border-2 border-gray-500 p-1" onClick={() => AiAlert()}>
                             <WandSparkles color={DarkMode ? "#ffffff" : "#000000"} />
                         </button>
 
-                        <button className="mr-2 border-2 border-gray-500 p-1" onClick={()=>SaveCode()} >
+                        <button className="mr-2 border-2 border-gray-500 p-1" onClick={() => SaveCode()} >
                             <Save color={DarkMode ? "#ffffff" : "#000000"} />
                         </button>
 
@@ -406,9 +426,9 @@ export default function PlayGround() {
                                                         value={val.name}
                                                         checked={Ind === ind}
                                                         onChange={() => {
-                                                            if(sessionStorage.getItem("code")){
+                                                            if (sessionStorage.getItem("code")) {
                                                                 sessionStorage.removeItem("code");
-                                                                codename.current="main";
+                                                                codename.current = "main";
                                                             }
                                                             setInd(ind);
                                                             setCode(Languages[ind].code);
@@ -437,18 +457,18 @@ export default function PlayGround() {
 
                     {/* Editor */}
                     <div className="w-full flex flex-1 bg-vscode justify-center items-center">
-                        {AiLoading ?<Spinner/>: 
-                        <Editor
-                            key={Ind}
-                            height="100%"
-                            width="100%"
-                            language={Languages[Ind].lang}
-                            options={editorOptions}
-                            value={Code}
-                            onChange={(val) => setCode(val)}
-                            theme={DarkMode ? 'vs-dark' : 'vs-light'}
-                        />
-}
+                        {AiLoading ? <Spinner /> :
+                            <Editor
+                                key={Ind}
+                                height="100%"
+                                width="100%"
+                                language={Languages[Ind].lang}
+                                options={editorOptions}
+                                value={Code}
+                                onChange={(val) => setCode(val)}
+                                theme={DarkMode ? 'vs-dark' : 'vs-light'}
+                            />
+                        }
                     </div>
                 </div>
 
