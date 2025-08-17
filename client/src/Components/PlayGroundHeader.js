@@ -57,13 +57,13 @@ export default function PlayGroundHeader() {
         
         {/* Logo */}
         <div className="pl-2 flex items-center">
-          <a href="/home" className="-m-1.5 p-1.5 flex items-center gap-2">
+          <a href="/" className="-m-1.5 p-1.5 flex items-center gap-2">
             {/* <img
               className="h-6 w-6"
               src="https://flowbite.com/docs/images/logo.svg"
               alt="Flowbite Logo"
             /> */}
-            <span className="font-bold text-2xl">Flowbite</span>
+                    <p className="font-tt text-3xl font-bold cursor-pointer" onClick={()=>navigate("/")}>{"<LazyCode/>"}</p>
           </a>
         </div>
 

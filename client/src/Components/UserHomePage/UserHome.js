@@ -1,6 +1,7 @@
 import UserHomeHeader from "./UserHomeHeader";
 import { ThemeContext } from "../../contexts/ThemeContext";
 import { useContext, useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import Card from "./Card";
 
 export default function UserHome() {
@@ -25,7 +26,13 @@ export default function UserHome() {
                     setUserCodes(data.codes);
                     setUserName(data.userName);
                 } else {
-                    alert("Unable to fetch user data.");
+                    Swal.fire({
+                        title:"Error",
+                        icon:"error",
+                        text:"Unable to fetch user data.",
+                        confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`,
+                        background: `${DarkMode ? '#1e1e1e' : 'white'}`,
+                    });
                 }
             } catch (error) {
                 console.error("Error fetching codes:", error);
