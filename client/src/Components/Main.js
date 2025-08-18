@@ -19,7 +19,7 @@ const Languages = [
         name: "Java (JDK 17.0.6)",
         code: `public class Main {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello, World!");\n\t}\n}`,
         extension: "java",
-        lang: "python"
+        lang: "java"
     },
     {
         id: 105,
@@ -218,7 +218,6 @@ export default function PlayGround() {
     let SaveCode = async () => {
         const token = localStorage.getItem("token") || sessionStorage.getItem("token");
         const stored = sessionStorage.getItem("code");
-        console.log(stored);
         if (!token) {
             alert("Login To Save Code");
             return;
@@ -279,7 +278,13 @@ export default function PlayGround() {
                     allowEscapeKey: false,
                     background: `${DarkMode ? '#1e1e1e' : 'white'}`,
                     color: `${DarkMode ? 'white' : 'black'}`,
-                    confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`
+                    confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`,
+                    preConfirm:()=>{
+                        if(Swal.getInput().value.trim()===""){
+                            Swal.showValidationMessage("Code Name Cant Be Empty");
+                            return false;
+                        } 
+                    }
                 }).then((result) => {
                     if (result.isConfirmed) {
                         codename.current = result.value;
@@ -305,7 +310,7 @@ export default function PlayGround() {
             const data = await Response.json();
             sessionStorage.setItem("code", data.code);
         } else {
-            alert("Login To Save Code");
+            Swal.fire({text:"Login To Save Code",title:"Error",icon:'error',background: `${DarkMode ? '#1e1e1e' : 'white'}`,timer:4000});
         }
     }
     let Spinner = () => <div className="loader" style={{

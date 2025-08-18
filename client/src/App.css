@@ -17,6 +17,11 @@
   height: 20px;
   animation: spin 1s linear infinite;
 }
+.swal2-input-dark {
+  background-color: #121212 !important; /* darker than modal */
+  color: #ffffff !important;
+  border: 1px solid #333 !important;
+}
 
 @keyframes spin {
   to {

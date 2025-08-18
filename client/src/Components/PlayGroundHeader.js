@@ -1,6 +1,7 @@
 import { useContext } from "react"
 import { ThemeContext } from "../contexts/ThemeContext"
 import { useNavigate } from "react-router-dom";
+import { Cookie } from "lucide-react";
 import { User } from "lucide-react";
 import Swal from "sweetalert2";
 export default function PlayGroundHeader() {
@@ -63,7 +64,10 @@ export default function PlayGroundHeader() {
               src="https://flowbite.com/docs/images/logo.svg"
               alt="Flowbite Logo"
             /> */}
-                    <p className="font-tt text-3xl font-bold cursor-pointer" onClick={()=>navigate("/")}>{"<LazyCode/>"}</p>
+                    <p className="font-tt text-3xl font-bold cursor-pointer flex flex-1 gap-2 justify-center align-middle" onClick={()=>navigate("/")}>
+                      CodeBite
+                      <Cookie  className="w-8 h-8"/>
+                    </p>
           </a>
         </div>
 
