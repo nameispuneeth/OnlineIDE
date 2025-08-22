@@ -193,6 +193,15 @@ app.post('/api/AiData',async(req,res)=>{
     }
 })
 
+app.post("/api/emailExists",async(req,res)=>{
+    const data=req.body;
+    console.log(data);
+    const result=await User.findOne({email:data.email});
+
+    if(result) res.send({status:'ok'});
+    else res.send({status:'error'}); 
+})
+
 app.listen(8000,()=>{
     console.log(`Port is Running At http://localhost:8000`)
 })
