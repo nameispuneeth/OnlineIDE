@@ -12,7 +12,7 @@ export default function PlayGroundHeader() {
   const isLogged=()=>{
     return localStorage.getItem("token")!=null || sessionStorage.getItem("token")!=null;
   }
-  const LogoutUser=()=>{
+  const LogoutUser=async ()=>{
     if(localStorage.getItem("token")!=null)  localStorage.removeItem("token");
     else sessionStorage.removeItem("token");
 
@@ -20,8 +20,14 @@ export default function PlayGroundHeader() {
       title:'Logout Successfull',
       icon:'success',
       text: 'You Have Been Logged Out Succesfully',
-      timer: 5000
-    })
+      confirmButtonText: "Continue",
+      background:`${DarkMode?'#1e1e1e':'white'}`,
+      confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`
+  }).then((result)=>{
+      if(result.isConfirmed){
+          navigate("/login")
+      }
+  });
 
   }
   const showLogin=()=>{
@@ -42,13 +48,12 @@ export default function PlayGroundHeader() {
         <div className={`border-2 rounded-full w-9 h-9 flex items-center justify-center ${DarkMode?'bg-black hover:bg-gray-800':'bg-gray-300 hover:bg-gray-400'} cursor-pointer`}>
           <User color={`${DarkMode?'white':'black'}`} size={23} onClick={()=>navigate('/userhome')}/>
         </div>
-        <a
-              href="/login"
+        <p
               className={`text-white font-bold text-sm px-4 py-2 ${DarkMode?'bg-red-700 hover:bg-red-800':'bg-black hover:bg-gray-700'} cursor-pointer`}
               onClick={()=>LogoutUser()}
             >
               Logout
-            </a>
+            </p>
         </div>
     )
   }

@@ -2,7 +2,7 @@ import { useContext, useState,useRef } from "react";
 import { ThemeContext } from "../../contexts/ThemeContext";
 import { CircleAlert } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
+import Cookies from 'js-cookie'
 
 export default function Register() {
     const navigate=useNavigate();
@@ -27,21 +27,12 @@ export default function Register() {
         })
 
         let data=await Response.json();
-        console.log(data);
-
+        
         if(data.status==='ok'){
-           Swal.fire({
-                title: "Sign Up Successful!",
-                text: "You have successfully created your account.",
-                icon: "success",
-                confirmButtonText: "Continue",
-               background:`${DarkMode?'#1e1e1e':'white'}`,
-                confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`
-            }).then((result)=>{
-                if(result.isConfirmed){
-                    navigate("/login")
-                }
-            });
+       
+        Cookies.set("Token", data.token, { expires: 20 / (24 * 60) });
+        Cookies.set("OTP", data.OTP, { expires: 20 / (24 * 60) });
+        navigate('/verify-otp',{ state: { purpose: "register" } });
 
         }else{
             setInvalid(true);

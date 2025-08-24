@@ -218,6 +218,13 @@ export default function PlayGround() {
         const token = localStorage.getItem("token") || sessionStorage.getItem("token");
         const stored = sessionStorage.getItem("code");
         if (!token) {
+            const codeToken={
+                code:Code,
+                extension:Languages[Ind].extension,
+                name:'main'
+            }
+
+            sessionStorage.setItem("code",JSON.stringify(codeToken));
             alert("Login To Save Code");
             return;
         }
@@ -321,7 +328,7 @@ export default function PlayGround() {
         animation: 'spin 1s linear infinite'
     }}></div>;
 
-    let getAiData = async (prompt, share) => {
+    let getAiData = async (prompt) => {
         setAiLoading(true);
         const Response = await fetch("http://localhost:8000/api/AiData", {
             method: "POST",
@@ -329,7 +336,7 @@ export default function PlayGround() {
             body: JSON.stringify({
                 Prompt: prompt,
                 Language: Languages[Ind].lang,
-                Code: share ? Code : Languages[Ind].code
+                Code: Code
             })
         });
         const data = await Response.json();
@@ -353,33 +360,26 @@ export default function PlayGround() {
                        border:1px solid ${DarkMode ? '#444' : '#ccc'};
                        resize:none;" 
                 placeholder="Type here..."></textarea>
-            <br/>
-            <label style="color:${DarkMode ? 'white' : 'black'}; font-size:14px;">
-                <input type="checkbox" id="my-checkbox" 
-                    style="accent-color:${DarkMode ? '#1d4ed8' : 'black'};" checked />
-                &nbsp;Share My Code
-            </label>
+            
         `,
             focusConfirm: false,
             background: `${DarkMode ? '#1e1e1e' : 'white'}`,
             confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`,
             preConfirm: () => {
                 const textareaValue = document.getElementById("my-textarea").value;
-                const checkboxChecked = document.getElementById("my-checkbox").checked;
 
                 if (!textareaValue) {
                     Swal.showValidationMessage("Prompt is required");
                     return false;
                 }
 
-                return { textareaValue, checkboxChecked };
+                return { textareaValue };
             }
         }).then((result) => {
             if (result.isConfirmed) {
                 const promptValue = result.value.textareaValue;
-                const shareValue = result.value.checkboxChecked;
 
-                getAiData(promptValue, shareValue);
+                getAiData(promptValue);
             }
         });
 

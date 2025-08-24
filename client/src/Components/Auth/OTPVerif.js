@@ -3,6 +3,8 @@ import "../../index.css";
 import { ThemeContext } from "../../contexts/ThemeContext";
 import { useContext, useRef, useState } from "react";
 import Cookies from 'js-cookie'
+import Swal from "sweetalert2";
+
 export default function OtpPage() {
   const { theme } = useContext(ThemeContext);
   const DarkMode = theme === "dark";
@@ -29,7 +31,7 @@ export default function OtpPage() {
     }
   };
 
-let VerifyOTP = () => {
+let VerifyOTP = async() => {
   console.log("Clicked");
   let currOTP = value.join("");   
   const OTP = Cookies.get("OTP");
@@ -38,7 +40,33 @@ let VerifyOTP = () => {
     if(purpose==="changepwd"){
       setShowPwdChange(true);
     }else{
-      navigate("/");
+      const Token=Cookies.get("Token");
+      console.log(Token);
+      const result=await fetch("http://localhost:8000/api/registerUser",{
+        method:"GET",
+        headers:{
+          'authorization':Token,
+          'Content-Type':'application/json'
+        }
+      })
+      const data=await result.json();
+      console.log(data);
+      if(data.status==='ok'){
+          Swal.fire({
+                title: "Sign Up Successful!",
+                text: "You have successfully created your account.",
+                icon: "success",
+                confirmButtonText: "Continue",
+                background:`${DarkMode?'#1e1e1e':'white'}`,
+                confirmButtonColor:`${DarkMode?'#1d4ed8':'black'}`
+            }).then((result)=>{
+                if(result.isConfirmed){
+                    navigate("/login")
+                }
+            });
+      }else{
+        alert(data.error);
+      }
     }
   }
   else alert("Wrong OTP");
