@@ -77,7 +77,6 @@ export default function PlayGround() {
             try {
                 let parsed = JSON.parse(SessionCode);
                 setCode(parsed.code);
-                console.log(parsed.code);
                 codename.current = parsed.name;
                 let tempInd = Languages.findIndex(lang => lang.extension === parsed.extension);
                 if (tempInd !== -1) {
@@ -357,7 +356,7 @@ export default function PlayGround() {
             <br/>
             <label style="color:${DarkMode ? 'white' : 'black'}; font-size:14px;">
                 <input type="checkbox" id="my-checkbox" 
-                    style="accent-color:${DarkMode ? '#1d4ed8' : 'black'};" />
+                    style="accent-color:${DarkMode ? '#1d4ed8' : 'black'};" checked />
                 &nbsp;Share My Code
             </label>
         `,

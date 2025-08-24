@@ -17,8 +17,12 @@ export default function Card({data,handleDelete}) {
     const DarkMode=theme==='dark';
 
     let setStorage=()=>{
+        
         const encodedData = {
-        ...data,
+        _id:data._id,
+        extension:data.extension,
+        name:CurrTitle,
+        date:data.date,
         code: atob(data.code),
         
         };
@@ -55,7 +59,7 @@ export default function Card({data,handleDelete}) {
                     icon:'success',
                     text:'SuccessFull Updation Of FileName',
                     timer:4000,
-                    background:`${DarkMode?'#2E2E2E':'white'}`
+            background: `${DarkMode ? '#1e1e1e' : 'white'}`,
                 })
                 setCurrTitle(title);
             }else{

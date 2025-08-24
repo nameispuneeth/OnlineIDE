@@ -221,8 +221,8 @@ app.post("/api/emailExists",async(req,res)=>{
             subject: 'Your Email Verification Code for PassWord Change',
             html: `
     <div style="font-family: Arial, sans-serif; line-height:1.5;">
-      <h4><b>Hello There,</h4></p>
-      <h5>Your verification code is:</h3> <h5>${OTP}</h1>
+      <h3><b>Hello There,</h3>
+    <h4>Your verification code is:</h4> <h1>${OTP}</h1>
       <h5>Please use this code within 5 minutes</span>.</h5>
       <br/>
       <p>Best regards,<br/><b>Codebite IDE Team</b></p>

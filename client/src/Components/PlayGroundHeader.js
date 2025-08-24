@@ -44,7 +44,7 @@ export default function PlayGroundHeader() {
         </div>
         <a
               href="/login"
-              className={`text-white font-bold text-sm px-4 py-2 ${DarkMode?'bg-red-600 hover:bg-red-800':'bg-black hover:bg-gray-700'} cursor-pointer`}
+              className={`text-white font-bold text-sm px-4 py-2 ${DarkMode?'bg-red-700 hover:bg-red-800':'bg-black hover:bg-gray-700'} cursor-pointer`}
               onClick={()=>LogoutUser()}
             >
               Logout
