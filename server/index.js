@@ -2,7 +2,7 @@ const express=require('express');
 const app=express();
 require('dotenv').config();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-
+const nodemailer=require('nodemailer');
 const mongoose=require('mongoose');
 const User=require('./models/user.model');
 const cors=require('cors');
@@ -16,6 +16,16 @@ app.use(express.json())
 mongoose.connect('mongodb://localhost:27017/ONLINEIDE')
 const genAi=new GoogleGenerativeAI(process.env.apiKey);
 const model=genAi.getGenerativeModel({model:'gemini-2.0-flash'});
+
+let transporter = nodemailer.createTransport({
+   host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.gmail,
+    pass: process.env.password
+  }
+});
 
 const secretcode=process.env.secretCode;
 app.get('/',(req,res)=>{
@@ -32,7 +42,7 @@ app.post('/api/login',async (req,res)=>{
                 const token=jwt.sign({
                     name:user.name,
                     email:user.email
-                },secretcode)
+                },secretcode);
 
                 res.json({status:'ok',token});
             }
@@ -195,11 +205,59 @@ app.post('/api/AiData',async(req,res)=>{
 
 app.post("/api/emailExists",async(req,res)=>{
     const data=req.body;
-    console.log(data);
     const result=await User.findOne({email:data.email});
 
-    if(result) res.send({status:'ok'});
-    else res.send({status:'error'}); 
+    if(result){
+        const token=jwt.sign({
+                    name:result.name,
+                    email:result.email
+                },secretcode);
+
+        const OTP=Math.floor(100000 + Math.random() * 900000);
+
+        let mailOptions = {
+            from: `"Codebite IDE" <${process.env.gmail}>`,
+            to:data.email,
+            subject: 'Your Email Verification Code for PassWord Change',
+            html: `
+    <div style="font-family: Arial, sans-serif; line-height:1.5;">
+      <h4><b>Hello There,</h4></p>
+      <h5>Your verification code is:</h3> <h5>${OTP}</h1>
+      <h5>Please use this code within 5 minutes</span>.</h5>
+      <br/>
+      <p>Best regards,<br/><b>Codebite IDE Team</b></p>
+    </div>
+  `
+            };
+
+            transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                console.log(error);
+                res.send({status:'error',error:'NETWORK ISSUES'})
+            } else {
+                console.log('Email sent: ' + info.response);
+                res.send({status:'ok',OTP:OTP,token:token});
+            }
+            });
+
+
+    }
+    else res.send({status:'error',error:'No Email Exists'}); 
+})
+
+app.post("/api/changePWD",async(req,res)=>{
+    const token=req.headers['authorization'];
+    const newPWD=req.body.pwd1;
+    try{
+        const data=jwt.verify(token,secretcode);
+        const newPassword=await bcrypt.hash(newPWD,10);
+        const updationres=await User.updateOne({email:data.email},{$set:{password:newPassword}});
+        console.log(updationres);
+        res.send({status:'ok'});
+
+    }catch{
+        res.send({status:'error',error:'Session Expired'});
+    }
 })
 
 app.listen(8000,()=>{

@@ -2,6 +2,7 @@ import { useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../../contexts/ThemeContext";
 import { CircleAlert } from 'lucide-react';
+import Cookies from 'js-cookie'
 
 
 export default function Login() {
@@ -63,9 +64,13 @@ export default function Login() {
         const res=await req.json();
 
         if(res.status==="ok"){
-            navigate("/verify-otp", { state: { purpose: "changepwd", email } });
+            sessionStorage.setItem('token',res.token);
+            Cookies.set("OTP", res.OTP, { expires: 20 / (24 * 60) });
+                const otp = Cookies.get("OTP");
+                console.log("OTP from cookie:", otp);
+                navigate("/verify-otp", { state: { purpose: "changepwd" } });
         }
-        else alert("No Email Exists");
+        else alert(res.error);
     }
     return (
         <div className="h-screen bg-black">
