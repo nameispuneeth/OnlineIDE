@@ -92,7 +92,6 @@ app.post('/api/register', async (req, res) => {
                     console.log(error);
                     res.send({ status: 'error', error: 'NETWORK ISSUES' })
                 } else {
-                    console.log('Email sent: ' + info.response);
                     res.send({ status: 'ok', OTP: OTP, token: token });
                 }
             });
@@ -259,7 +258,6 @@ app.post("/api/emailExists", async (req, res) => {
                 console.log(error);
                 res.send({ status: 'error', error: 'NETWORK ISSUES' })
             } else {
-                console.log('Email sent: ' + info.response);
                 res.send({ status: 'ok', OTP: OTP, token: token });
             }
         });
@@ -276,27 +274,24 @@ app.post("/api/changePWD", async (req, res) => {
         const data = jwt.verify(token, secretcode);
         const newPassword = await bcrypt.hash(newPWD, 10);
         const updationres = await User.updateOne({ email: data.email }, { $set: { password: newPassword } });
-        console.log(updationres);
         res.send({ status: 'ok' });
 
     } catch {
         res.send({ status: 'error', error: 'Session Expired' });
     }
 })
-app.get("/api/registerUser",async (req,res)=>{
-    const token=req.headers['authorization'];
-    console.log(token);
-    try{
+app.get("/api/registerUser", async (req, res) => {
+    const token = req.headers['authorization'];
+    try {
         const data = jwt.verify(token, secretcode);
-        console.log(data);
-        const user=await User.create({
-                 name:data.name,
-                 email:data.email,
-                 password:data.password,
-             })
-        res.send({status:'ok'});
-    }catch{
-        res.send({status:'error',error:'Network Issues'})
+        const user = await User.create({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+        })
+        res.send({ status: 'ok' });
+    } catch {
+        res.send({ status: 'error', error: 'Network Issues' })
     }
 })
 app.listen(8000, () => {

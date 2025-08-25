@@ -9,7 +9,7 @@ export default function UserHome() {
     const [userName, setUserName] = useState("");
     const [userCodes, setUserCodes] = useState([]);
 
-    
+
     const getUserCodes = async () => {
         const token = localStorage.getItem("token") || sessionStorage.getItem("token");
         if (token) {
@@ -27,9 +27,9 @@ export default function UserHome() {
                     setUserName(data.userName);
                 } else {
                     Swal.fire({
-                        title:"Error",
-                        icon:"error",
-                        text:"Unable to fetch user data.",
+                        title: "Error",
+                        icon: "error",
+                        text: "Unable to fetch user data.",
                         confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`,
                         background: `${DarkMode ? '#1e1e1e' : 'white'}`,
                     });
@@ -52,6 +52,27 @@ export default function UserHome() {
 
     const DarkMode = theme === 'dark';
 
+    let ShowUserData = () => {
+        return (
+            <>
+                {userCodes.map((data) => (
+                    <Card
+                        key={data._id}
+                        data={data}
+                        handleDelete={handleDelete}
+                    />
+                ))}
+            </>
+        );
+    }
+    let NoData = () => {
+        return (
+            <div className="p-10">
+                <p>No Saved Files To Display </p>
+            </div>
+        )
+    }
+
     return (
         <div className={`min-h-screen w-full ${DarkMode ? 'bg-gray-800 text-white' : 'bg-gray-300 text-black'}`}>
             <UserHomeHeader />
@@ -63,13 +84,7 @@ export default function UserHome() {
                     <p className="ml-2">Your Saved Files:</p>
                     <div className="flex justify-center items-center">
                         <div className={`mt-5 w-[95%] border-2 rounded flex flex-wrap gap-4 overflow-x-auto justify-center items-center ${DarkMode ? 'bg-gray-700' : 'bg-gray-400'}`}>
-                            {userCodes.map((data) => (
-                                <Card
-                                    key={data._id}
-                                    data={data}
-                                    handleDelete={handleDelete}
-                                />
-                            ))}
+                            {Object.keys(userCodes).length === 0 ? NoData() : ShowUserData()}
                         </div>
                     </div>
                 </div>
