@@ -70,6 +70,7 @@ export default function PlayGround() {
     const codename = useRef("main");
 
     const [AiLoading, setAiLoading] = useState(false);
+    const [SaveLoad,setSaveLoad]=useState(false);
 
     useEffect(() => {
         const SessionCode = sessionStorage.getItem("code");
@@ -215,6 +216,7 @@ export default function PlayGround() {
         setIsRunning(false);
     };
     let SaveCode = async () => {
+        setSaveLoad(true);
         const token = localStorage.getItem("token") || sessionStorage.getItem("token");
         const stored = sessionStorage.getItem("code");
         if (!token) {
@@ -223,7 +225,7 @@ export default function PlayGround() {
                 extension: Languages[Ind].extension,
                 name: 'main'
             }
-
+            setSaveLoad(false);
             sessionStorage.setItem("code", JSON.stringify(codeToken));
             alert("Login To Save Code");
             return;
@@ -231,7 +233,7 @@ export default function PlayGround() {
         else if (stored && stored !== "undefined") {
             const data = JSON.parse(stored);
 
-            const Response = await fetch("http://localhost:8000/api/updateCode", {
+            const Response = await fetch("https://codebite.onrender.com/api/updateCode", {
                 method: "POST",
                 headers: {
                     'authorization': token,
@@ -247,6 +249,7 @@ export default function PlayGround() {
 
             const result = await Response.json();
             if (result.status === "ok") {
+                setSaveLoad(false);
                 Swal.fire({
                     title: `<span style="color:${DarkMode ? 'white' : 'black'}">Success</span>`,
                     icon: 'success',
@@ -261,11 +264,13 @@ export default function PlayGround() {
                 });
 
             } else {
+                setSaveLoad(false);
                 alert("Unable To Save Code");
             }
             return;
         }
         if (token) {
+            setSaveLoad(false);
             if (codename.current === "main") {
                 await Swal.fire({
                     title: `<span style="color:${DarkMode ? 'white' : 'black'}">File Name</span>`,
@@ -298,7 +303,7 @@ export default function PlayGround() {
                 });
 
             }
-            const Response = await fetch("http://localhost:8000/api/pushCode", {
+            const Response = await fetch("https://codebite.onrender.com/api/pushCode", {
                 method: "POST",
                 headers: {
                     'authorization': token,
@@ -314,8 +319,26 @@ export default function PlayGround() {
                 })
             })
             const data = await Response.json();
-            sessionStorage.setItem("code", JSON.stringify(data.code));
+
+            if(data.status==="ok"){
+                setSaveLoad(false);
+                const codeToken = {
+                    code: atob(data.Code),
+                    extension: Languages[Ind].extension,
+                    name: data.name,
+                    _id:data._id,
+                    date:data.date
+                }
+                sessionStorage.setItem("code", JSON.stringify(codeToken));
+            }else{
+                                setSaveLoad(false);
+
+                Swal.fire({ text: "Unable To Save Code", title: "Error", icon: 'error', background: `${DarkMode ? '#1e1e1e' : 'white'}`, timer: 4000 });
+
+            }
         } else {
+                            setSaveLoad(false);
+
             Swal.fire({ text: "Login To Save Code", title: "Error", icon: 'error', background: `${DarkMode ? '#1e1e1e' : 'white'}`, timer: 4000 });
         }
     }
@@ -330,7 +353,7 @@ export default function PlayGround() {
 
     let getAiData = async (prompt) => {
         setAiLoading(true);
-        const Response = await fetch("http://localhost:8000/api/AiData", {
+        const Response = await fetch("https://codebite.onrender.com/api/AiData", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -403,7 +426,7 @@ export default function PlayGround() {
                         </button>
 
                         <button className="mr-2 border-2 border-gray-500 p-1" onClick={() => SaveCode()} >
-                            <Save color={DarkMode ? "#ffffff" : "#000000"} />
+                            {SaveLoad ? Spinner(): <Save color={DarkMode ? "#ffffff" : "#000000"} />}
                         </button>
 
                         {/* Language Dropdown */}

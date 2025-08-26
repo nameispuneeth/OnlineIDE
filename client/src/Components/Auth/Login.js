@@ -20,7 +20,7 @@ export default function Login() {
     let HandleSubmission = async (e) => {
         e.preventDefault();
         setLoading(true);
-        let Response = await fetch('http://localhost:8000/api/login', {
+        let Response = await fetch('https://codebite.onrender.com/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -59,7 +59,7 @@ export default function Login() {
             emailInput.reportValidity();
             return;
         }
-        const req = await fetch("http://localhost:8000/api/emailExists", {
+        const req = await fetch("https://codebite.onrender.com/api/emailExists", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'

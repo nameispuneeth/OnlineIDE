@@ -40,7 +40,7 @@ export default function OtpPage() {
         setShowPwdChange(true);
       } else {
         const Token = Cookies.get("Token");
-        const result = await fetch("http://localhost:8000/api/registerUser", {
+        const result = await fetch("https://codebite.onrender.com/api/registerUser", {
           method: "GET",
           headers: {
             'authorization': Token,
@@ -71,7 +71,7 @@ export default function OtpPage() {
   const ChangePWD = async () => {
     const token = sessionStorage.getItem("token");
     if (pwd1 === pwd2 && token) {
-      const response = await fetch("http://localhost:8000/api/changePWD", {
+      const response = await fetch("https://codebite.onrender.com/api/changePWD", {
         method: 'POST',
         headers: {
           'authorization': token,

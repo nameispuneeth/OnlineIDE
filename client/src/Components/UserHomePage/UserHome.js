@@ -1,6 +1,6 @@
 import UserHomeHeader from "./UserHomeHeader";
 import { ThemeContext } from "../../contexts/ThemeContext";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState,useRef } from "react";
 import Swal from "sweetalert2";
 import Card from "./Card";
 
@@ -8,13 +8,13 @@ export default function UserHome() {
     const { theme } = useContext(ThemeContext);
     const [userName, setUserName] = useState("");
     const [userCodes, setUserCodes] = useState([]);
-
-
+    const [loading, setLoading] = useState(true);
+    const userExists=useRef(false);
     const getUserCodes = async () => {
         const token = localStorage.getItem("token") || sessionStorage.getItem("token");
         if (token) {
             try {
-                const response = await fetch("http://localhost:8000/api/getUserData", {
+                const response = await fetch("https://codebite.onrender.com/api/getUserData", {
                     method: "GET",
                     headers: {
                         "authorization": token,
@@ -23,6 +23,8 @@ export default function UserHome() {
                 });
                 const data = await response.json();
                 if (data.status === "ok") {
+                    userExists.current=true;
+                    setLoading(false);
                     setUserCodes(data.codes);
                     setUserName(data.userName);
                 } else {
@@ -35,9 +37,11 @@ export default function UserHome() {
                     });
                 }
             } catch (error) {
+                setLoading(false);
                 console.error("Error fetching codes:", error);
             }
         } else {
+            setLoading(false);
             alert("Login to view your codes.");
         }
     };
@@ -55,30 +59,49 @@ export default function UserHome() {
     let ShowUserData = () => {
         return (
             <>
+
+
                 {userCodes.map((data) => (
                     <Card
                         key={data._id}
                         data={data}
                         handleDelete={handleDelete}
+
                     />
                 ))}
             </>
         );
     }
-    let NoData = () => {
-        return (
-            <div className="p-10">
-                <p>No Saved Files To Display </p>
-            </div>
+        let NoData = () =>{
+            return(
+                <div className="p-10">
+<p>
+    {loading ? " Loading ..." : "No Saved Files To Display"}
+    </p>
+        </div>
+            );
+        }
+
+    let Helper1=()=>{
+        return(
+            <>
+            {loading ?" ":"No User Credentials"}
+            </>
         )
     }
-
     return (
-        <div className={`min-h-screen w-full ${DarkMode ? 'bg-gray-800 text-white' : 'bg-gray-300 text-black'}`}>
+        <div className={`min-h-screen w-full ${DarkMode ? 'bg-gray-800 text-white' : 'bg-gray-300 text-black'} relative`}>
+            {loading &&
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 rounded">
+                    <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            }
             <UserHomeHeader />
             <div className="font-tt p-1">
+
                 <div className="ml-2 sm:text-4xl font-bold text-2xl mt-4">
-                    Welcome Back, {userName}
+                    {!userExists.current
+                        ? Helper1()                        : `Welcome Back, ${userName}`}
                 </div>
                 <div className={`mt-12 sm:text-2xl text-xl mb-12`}>
                     <p className="ml-2">Your Saved Files:</p>

@@ -18,7 +18,7 @@ export default function Register() {
         setInvalid(false);
         setLoading(true);
         e.preventDefault();
-        let Response = await fetch('http://localhost:8000/api/register', {
+        let Response = await fetch('https://codebite.onrender.com/api/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
