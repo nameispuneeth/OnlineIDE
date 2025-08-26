@@ -219,6 +219,7 @@ app.post('/api/AiData', async (req, res) => {
         const result = await model.generateContent("For This Prompt : " + req.body.Prompt + "\t In " + req.body.Language + "\t With This Code" + req.body.Code + "Just Give Me The Code Only");
         const aiResponse =
             result.response.candidates?.[0]?.content?.parts?.[0]?.text || "No output";
+
         res.send({ status: "ok", result: aiResponse });
     }
     catch {
