@@ -12,8 +12,9 @@ const { ObjectId } = require("mongoose").Types;
 
 app.use(cors());
 app.use(express.json())
-
-mongoose.connect('mongodb://localhost:27017/ONLINEIDE')
+const mongoLink=process.env.mongoDbLink;
+mongoose.connect(mongoLink) .then(() => console.log("✅ MongoDB Atlas Connected"))
+  .catch(err => console.error("❌ Connection error:", err));
 const genAi = new GoogleGenerativeAI(process.env.apiKey);
 const model = genAi.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
@@ -92,6 +93,7 @@ app.post('/api/register', async (req, res) => {
                     console.log(error);
                     res.send({ status: 'error', error: 'NETWORK ISSUES' })
                 } else {
+                    console.log(info);
                     res.send({ status: 'ok', OTP: OTP, token: token });
                 }
             });

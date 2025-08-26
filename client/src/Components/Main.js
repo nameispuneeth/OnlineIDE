@@ -314,7 +314,7 @@ export default function PlayGround() {
                 })
             })
             const data = await Response.json();
-            sessionStorage.setItem("code", data.code);
+            sessionStorage.setItem("code", JSON.stringify(data.code));
         } else {
             Swal.fire({ text: "Login To Save Code", title: "Error", icon: 'error', background: `${DarkMode ? '#1e1e1e' : 'white'}`, timer: 4000 });
         }
