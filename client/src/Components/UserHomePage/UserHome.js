@@ -119,7 +119,11 @@ export default function UserHome() {
                     title:"Success",
                     icon:'success',
                     text:"Name Changed SuccessFully",
-                    timer:3000
+                    timer:3000,
+                                showCancelButton: true,
+
+                    background: `${DarkMode ? '#1e1e1e' : 'white'}`,
+      confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`
                 })
             }
         }
