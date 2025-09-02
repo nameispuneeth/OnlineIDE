@@ -154,7 +154,7 @@ export default function Card({data,handleDelete}) {
         const blob = new Blob([atob(data.code)], { type: "text/plain" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `${data.name}.${data.extension}`;
+        link.download = `${CurrTitle}.${data.extension}`;
         link.click();
         URL.revokeObjectURL(link.href);
     }

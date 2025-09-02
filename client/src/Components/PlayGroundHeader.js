@@ -32,20 +32,19 @@ export default function PlayGroundHeader() {
   }
   const showLogin = () => {
     return (
-      <a
-        href="/login"
+      <p
         className={`text-white font-bold text-sm px-4 py-2 ${DarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-black hover:bg-gray-700'} cursor-pointer`}
         onClick={() => navigate("/login")}
       >
         Login
-      </a>
+      </p>
     );
   }
 
   const showLogout = () => {
     return (
       <div className="flex gap-3">
-        <div className={`border-2 rounded-full w-9 h-9 flex items-center justify-center ${DarkMode ? 'bg-black hover:bg-gray-800' : 'bg-gray-300 hover:bg-gray-400'} cursor-pointer`}>
+        <div className={`border-2 rounded-full w-9 h-9 flex items-center justify-center ${DarkMode ? 'bg-black hover:bg-gray-800' : 'bg-gray-400 hover:bg-gray-300'} cursor-pointer`}>
           <User color={`${DarkMode ? 'white' : 'black'}`} size={23} onClick={() => navigate('/userhome')} />
         </div>
         <p
@@ -58,7 +57,7 @@ export default function PlayGroundHeader() {
     )
   }
   return (
-    <header className={` border-b-2 h-16${DarkMode ? 'bg-black text-white border-white' : 'bg-white text-black border-black'} font-bold`}>
+    <header className={` border-b-2 h-16 ${DarkMode ? 'bg-gray-900 text-white border-white' : 'bg-gray-300 text-black border-black'} font-bold`}>
       <nav className="flex items-center justify-between p-4" aria-label="Global">
 
         {/* Logo */}

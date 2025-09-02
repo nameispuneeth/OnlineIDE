@@ -89,6 +89,59 @@ export default function UserHome() {
             </>
         )
     }
+    let changeName=async () => {
+        const { value: newName } = await Swal.fire({
+            title: "Change Your Name",
+            input: "text",
+            inputLabel: "Enter your new name",
+            inputPlaceholder: "New name...",
+            showCancelButton: true,
+            confirmButtonColor: DarkMode ? "#1d4ed8" : "black",
+            background: DarkMode ? "#1e1e1e" : "white",
+          });
+          if(newName && newName.trim()!==""){
+            const token=localStorage.getItem("token") || sessionStorage.getItem("token");
+            const response=await fetch("https://codebite.onrender.com/api/changeUserName",{
+                method:"POST",
+                headers:{
+                    'authorization':token,
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({Name:newName})
+            })
+            const data=await response.json();
+
+            if(data.status==="ok"){
+                localStorage.getItem("token")?localStorage.setItem("token",data.token):sessionStorage.setItem("token",data.token)
+                setUserName(newName);
+
+                Swal.fire({
+                    title:"Success",
+                    icon:'success',
+                    text:"Name Changed SuccessFully",
+                    timer:3000
+                })
+            }
+        }
+    }
+    let ChangeUserNameBtn= ()=>{
+        return(
+         <p
+  className={`text-white font-bold 
+    text-xs px-2 py-1     
+    sm:text-sm sm:px-3 sm:py-1.5 sm:mr-2   
+    md:text-base md:px-4 md:py-2   
+    rounded-lg shadow-md transition 
+    flex justify-center items-center
+    ${DarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-black hover:bg-gray-700'} 
+    cursor-pointer`}
+  onClick={() => changeName()}
+>
+  Change Name
+</p>
+
+        );
+    }
     return (
         <div className={`min-h-screen w-full ${DarkMode ? 'bg-gray-800 text-white' : 'bg-gray-300 text-black'} relative`}>
             {loading &&
@@ -99,10 +152,16 @@ export default function UserHome() {
             <UserHomeHeader />
             <div className="font-tt p-1">
 
-                <div className="ml-2 sm:text-4xl font-bold text-2xl mt-4">
+                <div className="ml-2 sm:text-4xl font-bold text-2xl mt-4 flex justify-between">
+                    <div>
                     {!userExists.current
                         ? Helper1()                        : `Welcome Back, ${userName}`}
+                        </div>
+                        <div>
+                        {userExists.current  && ChangeUserNameBtn()}
+                        </div>
                 </div>
+
                 <div className={`mt-12 sm:text-2xl text-xl mb-12`}>
                     <p className="ml-2">Your Saved Files:</p>
                     <div className="flex justify-center items-center">

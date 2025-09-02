@@ -297,6 +297,23 @@ app.get("/api/registerUser", async (req, res) => {
         res.send({ status: 'error', error: 'Network Issues' })
     }
 })
+
+app.post("/api/changeUserName",async (req,res)=>{
+    const token=authorization['token'];
+    try{
+        const data = jwt.verify(token, secretcode);
+        const updation=await User.updateOne({ email: data.email }, { $set: { name: req.body.Name } });
+        const token = jwt.sign({
+                name: req.body.name,
+                email: data.email,
+                password: data.password
+            }, secretcode);
+        res.send({status:'ok',token:token})
+        
+    }catch{
+        res.send({ status: 'error', error: 'Network Issues' }) 
+    }
+})
 app.listen(8000, () => {
     console.log(`Port is Running At http://localhost:8000`)
 })
