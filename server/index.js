@@ -299,16 +299,15 @@ app.get("/api/registerUser", async (req, res) => {
 })
 
 app.post("/api/changeUserName",async (req,res)=>{
-    const token=authorization['token'];
+    const token=req.headers["authorization"];
     try{
         const data = jwt.verify(token, secretcode);
         const updation=await User.updateOne({ email: data.email }, { $set: { name: req.body.Name } });
-        const token = jwt.sign({
-                name: req.body.name,
+        const newToken = jwt.sign({
+                name: req.body.Name,
                 email: data.email,
-                password: data.password
             }, secretcode);
-        res.send({status:'ok',token:token})
+        res.send({status:'ok',token:newToken})
         
     }catch{
         res.send({ status: 'error', error: 'Network Issues' }) 
