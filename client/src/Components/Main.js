@@ -1,7 +1,7 @@
 import { useContext, useRef, useState, useEffect } from "react";
 import { ThemeContext } from "../contexts/ThemeContext";
 import PlayGroundHeader from "./PlayGroundHeader";
-import { Sun, Moon, Save, WandSparkles } from 'lucide-react';
+import { Sun, Moon, Save, WandSparkles,PlusCircle } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import "../App.css";
 import Swal from 'sweetalert2';
@@ -67,10 +67,10 @@ export default function PlayGround() {
     const DarkMode = theme === 'dark';
     const [Ind, setInd] = useState(2);
     const [Code, setCode] = useState("");
-    const codename = useRef("main");
+    const [codename,setcodename] = useState("main");
 
     const [AiLoading, setAiLoading] = useState(false);
-    const [SaveLoad,setSaveLoad]=useState(false);
+    const [SaveLoad, setSaveLoad] = useState(false);
 
     useEffect(() => {
         const SessionCode = sessionStorage.getItem("code");
@@ -78,7 +78,7 @@ export default function PlayGround() {
             try {
                 let parsed = JSON.parse(SessionCode);
                 setCode(parsed.code);
-                codename.current = parsed.name;
+                setcodename(parsed.name);
                 let tempInd = Languages.findIndex(lang => lang.extension === parsed.extension);
                 if (tempInd !== -1) {
                     setInd(tempInd);
@@ -271,7 +271,7 @@ export default function PlayGround() {
         }
         if (token) {
             setSaveLoad(false);
-            if (codename.current === "main") {
+            if (codename === "main") {
                 await Swal.fire({
                     title: `<span style="color:${DarkMode ? 'white' : 'black'}">File Name</span>`,
                     input: 'text',
@@ -298,7 +298,7 @@ export default function PlayGround() {
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        codename.current = result.value;
+                        setcodename(result.value);
                     }
                 });
 
@@ -313,32 +313,41 @@ export default function PlayGround() {
                 body: JSON.stringify({
                     Code: btoa(Code),
                     Date: new Date(),
-                    name: codename.current,
+                    name: codename,
                     extension: Languages[Ind].extension
 
                 })
             })
             const data = await Response.json();
-
-            if(data.status==="ok"){
+            if (data.status === "ok") {
                 setSaveLoad(false);
                 const codeToken = {
-                    code: atob(data.Code),
+                    code: atob(data.code.code),
                     extension: Languages[Ind].extension,
-                    name: data.name,
-                    _id:data._id,
-                    date:data.date
+                    name: data.code.name,
+                    _id: data.code._id,
+                    date: data.code.date
                 }
                 sessionStorage.setItem("code", JSON.stringify(codeToken));
-            }else{
-                                setSaveLoad(false);
-
+                Swal.fire({
+                    title: `<span style="color:${DarkMode ? 'white' : 'black'}">Success</span>`,
+                    icon: 'success',
+                    text: 'File Saved Successfully',
+                    confirmButtonText: 'Ok',
+                    confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`,
+                    background: `${DarkMode ? '#1e1e1e' : 'white'}`,
+                    color: `${DarkMode ? 'white' : 'black'}`,
+                    customClass: {
+                        popup: 'swal-custom-popup',
+                    }
+                });
+            } else {
+                setSaveLoad(false);
                 Swal.fire({ text: "Unable To Save Code", title: "Error", icon: 'error', background: `${DarkMode ? '#1e1e1e' : 'white'}`, timer: 4000 });
 
             }
         } else {
-                            setSaveLoad(false);
-
+            setSaveLoad(false);
             Swal.fire({ text: "Login To Save Code", title: "Error", icon: 'error', background: `${DarkMode ? '#1e1e1e' : 'white'}`, timer: 4000 });
         }
     }
@@ -418,15 +427,21 @@ export default function PlayGround() {
                 <div className={`w-full h-full md:w-[60%] flex flex-col border-r-0 md:border-r-4 overflow-hidden ${DarkMode ? 'bg-vscode md:border-white' : 'bg-white md:border-black'}`}>
                     <header className={`flex justify-end items-center p-2 border-2 border-t-0 border-r-0 ${DarkMode ? 'bg-gray-800 border-white' : 'bg-gray-200 border-black'}`}>
                         <div className={`absolute left-2 p-3 border-r-2 ${DarkMode ? 'text-white border-white' : 'text-gray-700 border-black'} hidden md:block`}>
-                            {codename.current}.{Languages[Ind].extension}
+                            {codename}.{Languages[Ind].extension}
                         </div>
-
+                        <button className="mr-2 border-2 border-gray-500 p-1" onClick={async() => {
+                            sessionStorage.removeItem("code");
+                            setcodename("main");
+                            setCode(Languages[Ind].code)
+                        }}>
+                            <PlusCircle color={DarkMode ? "#ffffff" : "#000000"} />
+                        </button>
                         <button className="mr-2 border-2 border-gray-500 p-1" onClick={() => AiAlert()}>
                             <WandSparkles color={DarkMode ? "#ffffff" : "#000000"} />
                         </button>
 
                         <button className="mr-2 border-2 border-gray-500 p-1" onClick={() => SaveCode()} >
-                            {SaveLoad ? Spinner(): <Save color={DarkMode ? "#ffffff" : "#000000"} />}
+                            {SaveLoad ? Spinner() : <Save color={DarkMode ? "#ffffff" : "#000000"} />}
                         </button>
 
                         {/* Language Dropdown */}
@@ -455,7 +470,7 @@ export default function PlayGround() {
                                                         onChange={() => {
                                                             if (sessionStorage.getItem("code")) {
                                                                 sessionStorage.removeItem("code");
-                                                                codename.current = "main";
+                                                                setcodename("main");
                                                             }
                                                             setInd(ind);
                                                             setCode(Languages[ind].code);
