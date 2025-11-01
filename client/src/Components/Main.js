@@ -271,38 +271,37 @@ export default function PlayGround() {
         }
         if (token) {
             setSaveLoad(false);
-            if (codename === "main") {
-                await Swal.fire({
-                    title: `<span style="color:${DarkMode ? 'white' : 'black'}">File Name</span>`,
-                    input: 'text',
-                    inputPlaceholder: 'Your file name here',
-                    inputAttributes: {
-                        style: `
-            background:${DarkMode ? '#1e1e1e' : 'white'};
-            color:${DarkMode ? 'white' : 'black'};
-            border:1px solid ${DarkMode ? '#444' : '#ccc'};
-        `
-                    },
-                    showCancelButton: true,
-                    cancelButtonText: 'Save As Main',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    background: `${DarkMode ? '#1e1e1e' : 'white'}`,
-                    color: `${DarkMode ? 'white' : 'black'}`,
-                    confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`,
-                    preConfirm: () => {
-                        if (Swal.getInput().value.trim() === "") {
-                            Swal.showValidationMessage("Code Name Cant Be Empty");
-                            return false;
-                        }
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        setcodename(result.value);
-                    }
-                });
-
-            }
+            const { value: newName, isConfirmed } = await Swal.fire({
+                title: `<span style="color:${DarkMode ? 'white' : 'black'}">File Name</span>`,
+                input: 'text',
+                inputPlaceholder: 'Your file name here',
+                inputAttributes: {
+                  style: `
+                    background:${DarkMode ? '#1e1e1e' : 'white'};
+                    color:${DarkMode ? 'white' : 'black'};
+                    border:1px solid ${DarkMode ? '#444' : '#ccc'};
+                  `
+                },
+                showCancelButton: true,
+                cancelButtonText: 'Save As Main',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                background: `${DarkMode ? '#1e1e1e' : 'white'}`,
+                color: `${DarkMode ? 'white' : 'black'}`,
+                confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`,
+                preConfirm: () => {
+                  if (Swal.getInput().value.trim() === "") {
+                    Swal.showValidationMessage("Code Name Cant Be Empty");
+                    return false;
+                  }
+                }
+              });
+            
+              if (isConfirmed && newName.trim() !== "") {
+                setcodename(newName);
+              }
+            
+            const nameToSave = isConfirmed && newName.trim() !== "" ? newName : codename;
             const Response = await fetch("https://codebite.onrender.com/api/pushCode", {
                 method: "POST",
                 headers: {
@@ -313,7 +312,7 @@ export default function PlayGround() {
                 body: JSON.stringify({
                     Code: btoa(Code),
                     Date: new Date(),
-                    name: codename,
+                    name: nameToSave,
                     extension: Languages[Ind].extension
 
                 })
@@ -417,7 +416,36 @@ export default function PlayGround() {
 
 
     }
-
+    const NewPage=async()=>{
+        const token=localStorage.getItem("token") || sessionStorage.getItem("token");
+        const codeToken=localStorage.getItem("code") || sessionStorage.getItem("code");
+        if(token && codeToken && codeToken.code!==Code){
+            const result = await Swal.fire({
+                title: `<span style="color:${DarkMode ? 'white' : 'black'}">Unsaved Changes</span>`,
+                text: "You have unsaved changes. Would you like to save them before leaving?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Save",
+                cancelButtonText: "Cancel",
+                background: `${DarkMode ? '#1e1e1e' : 'white'}`,
+                color: `${DarkMode ? 'white' : 'black'}`,
+                confirmButtonColor: `${DarkMode ? '#2563eb' : 'black'}`,
+                cancelButtonColor: `${DarkMode ? '#6b7280' : '#888'}`,
+                reverseButtons: true,
+                customClass: {
+                  popup: 'swal-custom-popup'
+                }
+              });
+            
+              if (result.isConfirmed) {
+                await SaveCode();
+              }
+        }
+        sessionStorage.removeItem("code");
+        setcodename("main");
+        setCode(Languages[Ind].code)
+        
+    }
     return (
         <div className={`h-screen flex flex-col overflow-hidden ${DarkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
             <PlayGroundHeader />
@@ -429,11 +457,7 @@ export default function PlayGround() {
                         <div className={`absolute left-2 p-3 border-r-2 ${DarkMode ? 'text-white border-white' : 'text-gray-700 border-black'} hidden md:block`}>
                             {codename}.{Languages[Ind].extension}
                         </div>
-                        <button className="mr-2 border-2 border-gray-500 p-1" onClick={async() => {
-                            sessionStorage.removeItem("code");
-                            setcodename("main");
-                            setCode(Languages[Ind].code)
-                        }}>
+                        <button className="mr-2 border-2 border-gray-500 p-1" onClick={()=>NewPage()}>
                             <PlusCircle color={DarkMode ? "#ffffff" : "#000000"} />
                         </button>
                         <button className="mr-2 border-2 border-gray-500 p-1" onClick={() => AiAlert()}>
