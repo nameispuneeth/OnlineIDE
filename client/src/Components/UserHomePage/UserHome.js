@@ -10,11 +10,12 @@ export default function UserHome() {
     const [userCodes, setUserCodes] = useState([]);
     const [loading, setLoading] = useState(true);
     const userExists=useRef(false);
-    
+    const temp=useRef();
 
     const handleDelete = (id) => {
         setUserCodes((prevCodes) => prevCodes.filter(code => code._id !== id));
     };
+    const DarkMode = theme === 'dark';
 
     useEffect(() => {
         const getUserCodes = async () => {
@@ -53,9 +54,8 @@ export default function UserHome() {
             }
         };
         getUserCodes();
-    }, []);
+    }, [temp]);
 
-    const DarkMode = theme === 'dark';
 
     let ShowUserData = () => {
         return (
