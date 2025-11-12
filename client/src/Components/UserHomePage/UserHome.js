@@ -10,51 +10,54 @@ export default function UserHome() {
     const [userCodes, setUserCodes] = useState([]);
     const [loading, setLoading] = useState(true);
     const userExists=useRef(false);
-    const temp=useRef();
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+useEffect(() => {
+    const getUserCodes = async () => {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      if (token) {
+        try {
+          const response = await fetch("https://.onrender.com/api/getUserData", {
+            method: "GET",
+            headers: {
+              authorization: token,
+              "content-type": "application/json",
+            },
+          });
+          const data = await response.json();
+          if (data.status === "ok") {
+            userExists.current = true;
+            setLoading(false);
+            setUserCodes(data.codes);
+            setUserName(data.userName);
+          } else {
+            Swal.fire({
+              title: "Error",
+              icon: "error",
+              text: "Unable to fetch user data.",
+              confirmButtonColor: `${DarkMode ? "#1d4ed8" : "black"}`,
+              background: `${DarkMode ? "#1e1e1e" : "white"}`,
+            });
+          }
+        } catch (error) {
+          setLoading(false);
+          console.error("Error fetching codes:", error);
+        }
+      } else {
+        setLoading(false);
+        alert("Login to view your codes.");
+      }
+    };
+    getUserCodes();
+  }, []);
+
+  
     const handleDelete = (id) => {
         setUserCodes((prevCodes) => prevCodes.filter(code => code._id !== id));
     };
     const DarkMode = theme === 'dark';
 
-    useEffect(() => {
-        const getUserCodes = async () => {
-            const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-            if (token) {
-                try {
-                    const response = await fetch("https://codebite.onrender.com/api/getUserData", {
-                        method: "GET",
-                        headers: {
-                            "authorization": token,
-                            "content-type": "application/json"
-                        }
-                    });
-                    const data = await response.json();
-                    if (data.status === "ok") {
-                        userExists.current=true;
-                        setLoading(false);
-                        setUserCodes(data.codes);
-                        setUserName(data.userName);
-                    } else {
-                        Swal.fire({
-                            title: "Error",
-                            icon: "error",
-                            text: "Unable to fetch user data.",
-                            confirmButtonColor: `${DarkMode ? '#1d4ed8' : 'black'}`,
-                            background: `${DarkMode ? '#1e1e1e' : 'white'}`,
-                        });
-                    }
-                } catch (error) {
-                    setLoading(false);
-                    console.error("Error fetching codes:", error);
-                }
-            } else {
-                setLoading(false);
-                alert("Login to view your codes.");
-            }
-        };
-        getUserCodes();
-    }, [temp]);
+   
 
 
     let ShowUserData = () => {
@@ -102,7 +105,7 @@ export default function UserHome() {
           });
           if(newName && newName.trim()!==""){
             const token=localStorage.getItem("token") || sessionStorage.getItem("token");
-            const response=await fetch("https://codebite.onrender.com/api/changeUserName",{
+            const response=await fetch("https://.onrender.com/api/changeUserName",{
                 method:"POST",
                 headers:{
                     'authorization':token,
