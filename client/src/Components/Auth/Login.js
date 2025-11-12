@@ -75,7 +75,6 @@ export default function Login() {
             setLoading(false);
             sessionStorage.setItem('token', res.token);
             Cookies.set("OTP", res.OTP, { expires: 20 / (24 * 60) });
-            const otp = Cookies.get("OTP");
             navigate("/verify-otp", { state: { purpose: "changepwd" } });
         }
         else {
